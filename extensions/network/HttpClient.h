@@ -32,6 +32,12 @@
 #include "HttpRequest.h"
 #include "HttpResponse.h"
 
+#include "curl/curl.h"
+
+#define HTTP_UPLOAD_PROGRESS "HTTP_UPLOAD_PROGRESS"
+#define HTTP_UPLOAD_PROGRESS_PERCENT "HTTP_UPLOAD_PROGRESS_PERCENT"
+#define HTTP_UPLOAD_PROGRESS_STATUS "HTTP_UPLOAD_PROGRESS_STATUS"
+
 NS_CC_EXT_BEGIN
 
 /**
@@ -43,9 +49,55 @@ NS_CC_EXT_BEGIN
 /** @brief Singleton that handles asynchrounous http requests
  * Once the request completed, a callback will issued in main thread when it provided during make request
  */
+
+enum {
+    HttpUploadStart = 0,
+    HttpUploadInProgress = 1,
+    HttpUploadEnd = 2,
+};
+typedef unsigned int HttpUpload;
+
+
 class CCHttpClient : public CCObject
 {
 public:
+    
+
+    static int progress(void *p,
+                        double dltotal, double dlnow,
+                        double ultotal, double ulnow)
+    {
+        
+        float ulprog = ulnow * 100.0 / ultotal;
+        //float dlprog = dlnow * 100.0 / dltotal;
+        
+        
+        CCHttpClient::postUpdateNotification(ulprog, HttpUploadInProgress);
+        
+        return 0;
+    }
+    
+    static void postUpdateNotification(float percent, HttpUpload status)
+    {
+        
+        CCDictionary *data = CCDictionary::create();
+        data->retain();
+        
+        CCNumber *percentObj = CCNumber::create(percent);
+        percentObj->retain();
+        data->setObject(percentObj, HTTP_UPLOAD_PROGRESS_PERCENT);
+        
+        CCInteger *statusObj = CCInteger::create(status);
+        statusObj->retain();
+        data->setObject(statusObj, HTTP_UPLOAD_PROGRESS_STATUS);
+        
+        percentObj->release();
+        statusObj->release();
+        
+        CCNotificationCenter::sharedNotificationCenter()->postNotification(HTTP_UPLOAD_PROGRESS, (CCObject*)data);
+    }
+    
+    
     /** Return the shared instance **/
     static CCHttpClient *getInstance();
     

@@ -35,6 +35,63 @@ NS_CC_EXT_BEGIN
  Please refer to samples/TestCpp/Classes/ExtensionTest/NetworkTest/HttpClientTest.cpp as a sample
  @since v2.0.2
  */
+
+typedef enum
+{
+    FormDataTypeImage,
+    FormDataTypeVar,
+} FormDataType;
+
+class CCForm : public CCObject
+{
+public:
+   
+    
+    CCForm()
+    {
+        m_pName.clear();
+        m_pValue.clear();
+    };
+    
+    /** Destructor */
+    virtual ~CCForm()
+    {
+        
+    };
+    
+    static CCForm *createWithTypeNameValue(FormDataType type, const char* pName,const char* pValue)
+    {
+        CCForm *form = new CCForm();
+        form->setNameAndValue(pName, pValue);
+        form->setType(type);
+        return form;
+    }
+    
+    inline void setNameAndValue(const char* pName,const char* pValue)
+    {
+        m_pName.clear();
+        m_pName = pName;
+        m_pValue.clear();
+        m_pValue = pValue;
+    };
+    
+    inline const char* getName()
+    {
+        return m_pName.c_str();
+    };
+    
+    inline const char* getValue()
+    {
+        return m_pValue.c_str();
+    };
+
+protected:
+    CC_SYNTHESIZE(FormDataType, m_pType, Type)
+    std::string m_pName;
+    std::string m_pValue;
+
+};
+
 class CCHttpRequest : public CCObject
 {
 public:
@@ -61,6 +118,14 @@ public:
         _pTarget = NULL;
         _pSelector = NULL;
         _pUserData = NULL;
+        _userName.clear();
+        _userPassword.clear();
+        _headers = CCArray::create();
+        _headers->retain();
+        
+        _form = CCArray::create();
+        _form->retain();
+        
     };
     
     /** Destructor */
@@ -70,6 +135,8 @@ public:
         {
             _pTarget->release();
         }
+        _headers->release();
+        _form->release();
     };
     
     /** Override autorelease method to avoid developers to call it */
@@ -175,20 +242,48 @@ public:
     {
         return _pSelector;
     }
+    
+    //username
+    inline void setUserName(const char* userName)
+    {
+        _userName = userName;
+    };
+    inline const char* getUserName()
+    {
+        return _userName.c_str();
+    };
 
-    /** Set any custom headers **/
-    inline void setHeaders(std::vector<std::string> pHeaders)
-   	{
-   		_headers=pHeaders;
-   	}
-   
-    /** Get custom headers **/
-   	inline std::vector<std::string> getHeaders()
-   	{
-   		return _headers;
-   	}
+    //password
+    inline void setUserPassword(const char* userPassword)
+    {
+        _userPassword = userPassword;
+    };
+    inline const char* getUserPassword()
+    {
+        return _userPassword.c_str();
+    };
+
+    inline void addHeader(const char* header)
+    {
+        CCString *data = CCString::create(header);
+        _headers->addObject(data);
+    };
+    inline CCArray* getHeaders()
+    {
+        return _headers;
+    };
 
 
+    inline void addForm(CCForm *form)
+    {
+        _form->addObject(form);
+    };
+    inline CCArray* getForms()
+    {
+        return _form;
+    };
+
+    
 protected:
     // properties
     HttpRequestType             _requestType;    /// kHttpRequestGet, kHttpRequestPost or other enums
@@ -197,8 +292,13 @@ protected:
     std::string                 _tag;            /// user defined tag, to identify different requests in response callback
     CCObject*          _pTarget;        /// callback target of pSelector function
     SEL_CallFuncND     _pSelector;      /// callback function, e.g. MyLayer::onHttpResponse(CCObject *sender, void *data)
-    void*                       _pUserData;      /// You can add your customed data here 
-    std::vector<std::string>    _headers;		      /// custom http headers
+    void*                       _pUserData;      /// You can add your customed data here
+    
+    std::string                 _userName;
+    std::string                 _userPassword;
+    CCArray*                    _headers;
+    CCArray*                    _form;
+    
 };
 
 NS_CC_EXT_END
