@@ -156,15 +156,6 @@ extern "C" {
         }
     }
 
-    void setAccelerometerIntervalJNI(float interval) {
-        JniMethodInfo t;
-
-        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "setAccelerometerInterval", "(I)V")) {
-            t.env->CallStaticVoidMethod(t.classID, t.methodID, interval);
-            t.env->DeleteLocalRef(t.classID);
-        }
-    }
-
     void disableAccelerometerJNI() {
         JniMethodInfo t;
 
@@ -172,5 +163,24 @@ extern "C" {
             t.env->CallStaticVoidMethod(t.classID, t.methodID);
             t.env->DeleteLocalRef(t.classID);
         }
+    }
+    
+    void startCameraPreviewJNI() {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "startCameraPreview", "()V")) {
+            t.env->CallStaticVoidMethod(t.classID, t.methodID);
+            t.env->DeleteLocalRef(t.classID);
+        }
+    }
+    
+    void stopCameraPreviewJNI() {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "stopCameraPreview", "()V")) {
+            t.env->CallStaticVoidMethod(t.classID, t.methodID);
+            t.env->DeleteLocalRef(t.classID);
+        }
+        
     }
 }

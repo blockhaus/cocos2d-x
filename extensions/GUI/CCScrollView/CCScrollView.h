@@ -51,6 +51,7 @@ public:
     virtual ~CCScrollViewDelegate() {}
     virtual void scrollViewDidScroll(CCScrollView* view) = 0;
     virtual void scrollViewDidZoom(CCScrollView* view) = 0;
+    virtual void scrollViewDidChangeFocus(int pos) = 0;
 };
 
 
@@ -150,11 +151,11 @@ public:
     /**
      * Returns the current container's minimum offset. You may want this while you animate scrolling by yourself
      */
-    CCPoint minContainerOffset();
+    virtual CCPoint minContainerOffset();
     /**
      * Returns the current container's maximum offset. You may want this while you animate scrolling by yourself
      */
-    CCPoint maxContainerOffset(); 
+    virtual CCPoint maxContainerOffset(); 
     /**
      * Determines if a given node's bounding box is in visible bounds
      *
@@ -218,7 +219,17 @@ public:
     virtual void addChild(CCNode * child, int zOrder);
     virtual void addChild(CCNode * child);
     void setTouchEnabled(bool e);
+    
+    bool isPagingEnabeld() {return m_fPagingEnabeld;}
+    void setPagingEnabeld( bool pPagingEnabeld );
+    
+    void setPagingSize( CCSize pPagingSize ) { m_fPagingSize = pPagingSize; }
+    
+    void setPagingFocusToIndex(int idx);
+    
 private:
+    
+    
     /**
      * Init this object with a given size to clip its content.
      *
@@ -262,6 +273,13 @@ private:
     void handleZoom();
 
 protected:
+    
+    bool m_fPagingEnabeld;
+    
+	CCSize m_fPagingSize;
+    
+    int m_fPagingFocus;
+    
     /**
      * current zoom scale
      */

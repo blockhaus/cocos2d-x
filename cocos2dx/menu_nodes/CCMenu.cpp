@@ -650,18 +650,22 @@ CCMenuItem* CCMenu::itemForTouch(CCTouch *touch)
     if (m_pChildren && m_pChildren->count() > 0)
     {
         CCObject* pObject = NULL;
-        CCARRAY_FOREACH(m_pChildren, pObject)
+ 
+        for (int i=m_pChildren->count()-1;i>=0;i--)
         {
-            CCMenuItem* pChild = dynamic_cast<CCMenuItem*>(pObject);
-            if (pChild && pChild->isVisible() && pChild->isEnabled())
+    
+            pObject = m_pChildren->objectAtIndex(i);
+            CCNode* pChild = dynamic_cast<CCNode*>(pObject);
+            if (pChild && pChild->isVisible() && ((CCMenuItem*)pChild)->isEnabled())
             {
                 CCPoint local = pChild->convertToNodeSpace(touchLocation);
-                CCRect r = pChild->rect();
+                CCRect r = ((CCMenuItem*)pChild)->rect();
+        
                 r.origin = CCPointZero;
 
                 if (r.containsPoint(local))
                 {
-                    return pChild;
+                    return (CCMenuItem*)pChild;
                 }
             }
         }

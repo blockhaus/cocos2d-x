@@ -283,6 +283,19 @@
 		1551A872158F2ADF00E66CFE /* CCTouchHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 1551A627158F2ADE00E66CFE /* CCTouchHandler.h */; };
 		1551A874158F2B4700E66CFE /* cocos2dx-Prefix.pch in Headers */ = {isa = PBXBuildFile; fileRef = 1551A873158F2B4700E66CFE /* cocos2dx-Prefix.pch */; };
 		2628297A15EC7064002C4240 /* ccTypeInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 2628297915EC7064002C4240 /* ccTypeInfo.h */; };
+		4C466ED9164A6B7000C42395 /* MECameraStream_objec.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466ED3164A6B7000C42395 /* MECameraStream_objec.h */; };
+		4C466EDA164A6B7000C42395 /* MECameraStream_objec.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C466ED4164A6B7000C42395 /* MECameraStream_objec.m */; };
+		4C466EDB164A6B7000C42395 /* MECameraStream.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466ED5164A6B7000C42395 /* MECameraStream.h */; };
+		4C466EDC164A6B7000C42395 /* MECameraStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4C466ED6164A6B7000C42395 /* MECameraStream.mm */; };
+		4C466EDD164A6B7000C42395 /* MECameraStreamWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466ED7164A6B7000C42395 /* MECameraStreamWrapper.h */; };
+		4C466EDE164A6B7000C42395 /* MECameraStreamWrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4C466ED8164A6B7000C42395 /* MECameraStreamWrapper.mm */; };
+		4C466EE7164A6B7B00C42395 /* UIDevice-hardware.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466EE0164A6B7B00C42395 /* UIDevice-hardware.h */; };
+		4C466EE8164A6B7B00C42395 /* UIDevice-hardware.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C466EE1164A6B7B00C42395 /* UIDevice-hardware.m */; };
+		4C466EE9164A6B7B00C42395 /* UIImage+ProportionalFill.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466EE3164A6B7B00C42395 /* UIImage+ProportionalFill.h */; };
+		4C466EEA164A6B7B00C42395 /* UIImage+ProportionalFill.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C466EE4164A6B7B00C42395 /* UIImage+ProportionalFill.m */; };
+		4C466EEB164A6B7B00C42395 /* UIImage+Tint.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466EE5164A6B7B00C42395 /* UIImage+Tint.h */; };
+		4C466EEC164A6B7B00C42395 /* UIImage+Tint.m in Sources */ = {isa = PBXBuildFile; fileRef = 4C466EE6164A6B7B00C42395 /* UIImage+Tint.m */; };
+		4C466F33164A940A00C42395 /* MECameraStreamDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 4C466F32164A940A00C42395 /* MECameraStreamDelegate.h */; };
 		D43F7F8A15C7D8BA00D713FC /* CCTouch.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D43F7F8915C7D8BA00D713FC /* CCTouch.cpp */; };
 /* End PBXBuildFile section */
 
@@ -566,6 +579,19 @@
 		1551A627158F2ADE00E66CFE /* CCTouchHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCTouchHandler.h; sourceTree = "<group>"; };
 		1551A873158F2B4700E66CFE /* cocos2dx-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "cocos2dx-Prefix.pch"; sourceTree = "<group>"; };
 		2628297915EC7064002C4240 /* ccTypeInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ccTypeInfo.h; sourceTree = "<group>"; };
+		4C466ED3164A6B7000C42395 /* MECameraStream_objec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MECameraStream_objec.h; sourceTree = "<group>"; };
+		4C466ED4164A6B7000C42395 /* MECameraStream_objec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MECameraStream_objec.m; sourceTree = "<group>"; };
+		4C466ED5164A6B7000C42395 /* MECameraStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MECameraStream.h; sourceTree = "<group>"; };
+		4C466ED6164A6B7000C42395 /* MECameraStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MECameraStream.mm; sourceTree = "<group>"; };
+		4C466ED7164A6B7000C42395 /* MECameraStreamWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MECameraStreamWrapper.h; sourceTree = "<group>"; };
+		4C466ED8164A6B7000C42395 /* MECameraStreamWrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MECameraStreamWrapper.mm; sourceTree = "<group>"; };
+		4C466EE0164A6B7B00C42395 /* UIDevice-hardware.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice-hardware.h"; sourceTree = "<group>"; };
+		4C466EE1164A6B7B00C42395 /* UIDevice-hardware.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice-hardware.m"; sourceTree = "<group>"; };
+		4C466EE3164A6B7B00C42395 /* UIImage+ProportionalFill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ProportionalFill.h"; sourceTree = "<group>"; };
+		4C466EE4164A6B7B00C42395 /* UIImage+ProportionalFill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ProportionalFill.m"; sourceTree = "<group>"; };
+		4C466EE5164A6B7B00C42395 /* UIImage+Tint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Tint.h"; sourceTree = "<group>"; };
+		4C466EE6164A6B7B00C42395 /* UIImage+Tint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Tint.m"; sourceTree = "<group>"; };
+		4C466F32164A940A00C42395 /* MECameraStreamDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MECameraStreamDelegate.h; sourceTree = "<group>"; };
 		D43F7F8915C7D8BA00D713FC /* CCTouch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCTouch.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -903,6 +929,7 @@
 		1551A43F158F2ADE00E66CFE /* platform */ = {
 			isa = PBXGroup;
 			children = (
+				4C466F32164A940A00C42395 /* MECameraStreamDelegate.h */,
 				1551A46C158F2ADE00E66CFE /* CCAccelerometerDelegate.h */,
 				1551A46D158F2ADE00E66CFE /* CCApplicationProtocol.h */,
 				1551A46E158F2ADE00E66CFE /* CCCommon.h */,
@@ -925,6 +952,12 @@
 		1551A47B158F2ADE00E66CFE /* ios */ = {
 			isa = PBXGroup;
 			children = (
+				4C466ED3164A6B7000C42395 /* MECameraStream_objec.h */,
+				4C466ED4164A6B7000C42395 /* MECameraStream_objec.m */,
+				4C466ED5164A6B7000C42395 /* MECameraStream.h */,
+				4C466ED6164A6B7000C42395 /* MECameraStream.mm */,
+				4C466ED7164A6B7000C42395 /* MECameraStreamWrapper.h */,
+				4C466ED8164A6B7000C42395 /* MECameraStreamWrapper.mm */,
 				1551A47C158F2ADE00E66CFE /* AccelerometerDelegateWrapper.h */,
 				1551A47D158F2ADE00E66CFE /* AccelerometerDelegateWrapper.mm */,
 				1551A47E158F2ADE00E66CFE /* CCAccelerometer.h */,
@@ -950,6 +983,8 @@
 				1551A492158F2ADE00E66CFE /* EAGLView.h */,
 				1551A493158F2ADE00E66CFE /* EAGLView.mm */,
 				1551A4A0158F2ADE00E66CFE /* OpenGL_Internal.h */,
+				4C466EDF164A6B7B00C42395 /* UIDeviceHardware */,
+				4C466EE2164A6B7B00C42395 /* UIImageCrop */,
 				1551A4A1158F2ADE00E66CFE /* Simulation */,
 			);
 			path = ios;
@@ -1140,6 +1175,26 @@
 			path = touch_dispatcher;
 			sourceTree = "<group>";
 		};
+		4C466EDF164A6B7B00C42395 /* UIDeviceHardware */ = {
+			isa = PBXGroup;
+			children = (
+				4C466EE0164A6B7B00C42395 /* UIDevice-hardware.h */,
+				4C466EE1164A6B7B00C42395 /* UIDevice-hardware.m */,
+			);
+			path = UIDeviceHardware;
+			sourceTree = "<group>";
+		};
+		4C466EE2164A6B7B00C42395 /* UIImageCrop */ = {
+			isa = PBXGroup;
+			children = (
+				4C466EE3164A6B7B00C42395 /* UIImage+ProportionalFill.h */,
+				4C466EE4164A6B7B00C42395 /* UIImage+ProportionalFill.m */,
+				4C466EE5164A6B7B00C42395 /* UIImage+Tint.h */,
+				4C466EE6164A6B7B00C42395 /* UIImage+Tint.m */,
+			);
+			path = UIImageCrop;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1303,6 +1358,13 @@
 				1551A874158F2B4700E66CFE /* cocos2dx-Prefix.pch in Headers */,
 				154269DD15B5653000712A7F /* CCNotificationCenter.h in Headers */,
 				2628297A15EC7064002C4240 /* ccTypeInfo.h in Headers */,
+				4C466ED9164A6B7000C42395 /* MECameraStream_objec.h in Headers */,
+				4C466EDB164A6B7000C42395 /* MECameraStream.h in Headers */,
+				4C466EDD164A6B7000C42395 /* MECameraStreamWrapper.h in Headers */,
+				4C466EE7164A6B7B00C42395 /* UIDevice-hardware.h in Headers */,
+				4C466EE9164A6B7B00C42395 /* UIImage+ProportionalFill.h in Headers */,
+				4C466EEB164A6B7B00C42395 /* UIImage+Tint.h in Headers */,
+				4C466F33164A940A00C42395 /* MECameraStreamDelegate.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1477,6 +1539,12 @@
 				1551A871158F2ADF00E66CFE /* CCTouchHandler.cpp in Sources */,
 				154269DC15B5653000712A7F /* CCNotificationCenter.cpp in Sources */,
 				D43F7F8A15C7D8BA00D713FC /* CCTouch.cpp in Sources */,
+				4C466EDA164A6B7000C42395 /* MECameraStream_objec.m in Sources */,
+				4C466EDC164A6B7000C42395 /* MECameraStream.mm in Sources */,
+				4C466EDE164A6B7000C42395 /* MECameraStreamWrapper.mm in Sources */,
+				4C466EE8164A6B7B00C42395 /* UIDevice-hardware.m in Sources */,
+				4C466EEA164A6B7B00C42395 /* UIImage+ProportionalFill.m in Sources */,
+				4C466EEC164A6B7B00C42395 /* UIImage+Tint.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1549,7 +1617,9 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos6.0;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Debug;
 		};
@@ -1572,7 +1642,9 @@
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos6.0;
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "armv7 armv7s";
 			};
 			name = Release;
 		};

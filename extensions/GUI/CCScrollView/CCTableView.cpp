@@ -118,6 +118,8 @@ void CCTableView::reloadData()
     m_pCellsUsed = new CCArrayForObjectSorting();
     
     this->_updateContentSize();
+    this->setContentOffset(CCPoint(0,this->minContainerOffset().y));
+    
     if (m_pDataSource->numberOfCellsInTableView(this) > 0)
     {
         this->scrollViewDidScroll(this);
@@ -131,19 +133,15 @@ CCTableViewCell *CCTableView::cellAtIndex(unsigned int idx)
 
 void CCTableView::updateCellAtIndex(unsigned int idx)
 {
-    if (idx == CC_INVALID_INDEX)
+    if (idx == CC_INVALID_INDEX || idx > m_pDataSource->numberOfCellsInTableView(this)-1)
     {
         return;
     }
-    unsigned int uCountOfItems = m_pDataSource->numberOfCellsInTableView(this);
-    if (0 == uCountOfItems || idx > uCountOfItems-1)
-    {
-        return;
-    }
-
-    CCTableViewCell* cell = this->_cellWithIndex(idx);
-    if (cell)
-    {
+    
+    CCTableViewCell *cell;
+    
+    cell = this->_cellWithIndex(idx);
+    if (cell) {
         this->_moveCellOutOfSight(cell);
     } 
     cell = m_pDataSource->tableCellAtIndex(this, idx);
@@ -153,19 +151,11 @@ void CCTableView::updateCellAtIndex(unsigned int idx)
 
 void CCTableView::insertCellAtIndex(unsigned  int idx)
 {
-    if (idx == CC_INVALID_INDEX)
-    {
+    if (idx == CC_INVALID_INDEX || idx > m_pDataSource->numberOfCellsInTableView(this)-1) {
         return;
     }
-
-    unsigned int uCountOfItems = m_pDataSource->numberOfCellsInTableView(this);
-    if (0 == uCountOfItems || idx > uCountOfItems-1)
-    {
-        return;
-    }
-
-    CCTableViewCell* cell = NULL;
-    int newIdx = 0;
+    CCTableViewCell *cell;
+    int newIdx;
     
     cell = (CCTableViewCell*)m_pCellsUsed->objectWithObjectID(idx);
     if (cell) 
@@ -190,19 +180,12 @@ void CCTableView::insertCellAtIndex(unsigned  int idx)
 
 void CCTableView::removeCellAtIndex(unsigned int idx)
 {
-    if (idx == CC_INVALID_INDEX)
-    {
+    if (idx == CC_INVALID_INDEX || idx > m_pDataSource->numberOfCellsInTableView(this)-1) {
         return;
     }
     
-    unsigned int uCountOfItems = m_pDataSource->numberOfCellsInTableView(this);
-    if (0 == uCountOfItems || idx > uCountOfItems-1)
-    {
-        return;
-    }
-
-    CCTableViewCell* cell = NULL;
-    unsigned int newIdx = 0;
+    CCTableViewCell   *cell;
+    unsigned int newIdx;
     
     cell = this->_cellWithIndex(idx);
     if (!cell) {
@@ -381,19 +364,17 @@ void CCTableView::_setIndexForCell(unsigned int index, CCTableViewCell *cell)
 
 void CCTableView::scrollViewDidScroll(CCScrollView* view)
 {
-    unsigned int uCountOfItems = m_pDataSource->numberOfCellsInTableView(this);
-    if (0 == uCountOfItems)
-    {
-        return;
-    }
-
+    if (m_pDataSource->numberOfCellsInTableView(this)>0) {
+    
     unsigned int startIdx = 0, endIdx = 0, idx = 0, maxIdx = 0;
-    CCPoint offset = ccpMult(this->getContentOffset(), -1);
-    maxIdx = MAX(uCountOfItems-1, 0);
+    CCPoint offset;
+
+    offset   = ccpMult(this->getContentOffset(), -1);
+    maxIdx   = MAX(m_pDataSource->numberOfCellsInTableView(this)-1, 0);
+    
     const CCSize cellSize = m_pDataSource->cellSizeForTable(this);
     
-    if (m_eVordering == kCCTableViewFillTopDown)
-    {
+    if (m_eVordering == kCCTableViewFillTopDown) {
         offset.y = offset.y + m_tViewSize.height/this->getContainer()->getScaleY() - cellSize.height;
     }
     startIdx = this->_indexFromOffset(offset);
@@ -479,6 +460,8 @@ void CCTableView::scrollViewDidScroll(CCScrollView* view)
         }
         this->updateCellAtIndex(i);
     }
+        
+    }
 }
 
 void CCTableView::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
@@ -504,6 +487,20 @@ void CCTableView::ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent)
         }
     }
     CCScrollView::ccTouchEnded(pTouch, pEvent);
+}
+
+void CCTableView::setPagingEnabeld( bool pPagingEnabeld )
+{
+    CCScrollView::setPagingEnabeld(pPagingEnabeld);
+    if (pPagingEnabeld) {
+        const CCSize cellSize = m_pDataSource->cellSizeForTable(this);
+        CCScrollView::setPagingSize(cellSize);
+    }
+}
+
+void CCTableView::scrollViewDidChangeFocus(int pos)
+{
+    m_pTableViewDelegate->tableCellDidChangeFocus(this, pos);
 }
 
 NS_CC_EXT_END

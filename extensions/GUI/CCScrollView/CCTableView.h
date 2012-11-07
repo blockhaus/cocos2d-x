@@ -54,6 +54,7 @@ public:
      * @param cell  cell that is touched
      */
     virtual void tableCellTouched(CCTableView* table, CCTableViewCell* cell) = 0;
+    virtual void tableCellDidChangeFocus(CCTableView* table, unsigned int idx) = 0;
 };
 
 
@@ -177,7 +178,12 @@ public:
     virtual void scrollViewDidScroll(CCScrollView* view);
     virtual void scrollViewDidZoom(CCScrollView* view) {}
     virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent);
-
+    
+    
+    virtual void scrollViewDidChangeFocus(int pos);
+    bool isPagingEnabeld() {return m_fPagingEnabeld;}
+    void setPagingEnabeld( bool pPagingEnabeld );
+    
 protected:
     
     /**
@@ -219,6 +225,8 @@ protected:
     void _moveCellOutOfSight(CCTableViewCell *cell);
     void _setIndexForCell(unsigned int index, CCTableViewCell *cell);
     void _addCellIfNecessary(CCTableViewCell * cell);
+    
+    bool m_fPagingEnabeld;
 
 };
 

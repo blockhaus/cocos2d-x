@@ -246,29 +246,26 @@ int processGetTask(CCHttpRequest *request, write_callback callback, void *stream
             break;
         }
         
-        /* handle custom header data */
-        /* create curl linked list */
-        struct curl_slist *cHeaders=NULL;
-        /* get custom header data (if set) */
-       	std::vector<std::string> headers=request->getHeaders();
-      		if(!headers.empty())
-      		{      			
-        			for(std::vector<std::string>::iterator it=headers.begin();it!=headers.end();it++)
-        			{
-              /* append custom headers one by one */
-          				cHeaders=curl_slist_append(cHeaders,it->c_str());
-        			}
-           /* set custom headers for curl */
-        			code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, cHeaders);
-        			if (code != CURLE_OK) {
-          				break;
-        			}
-      		}
-              
         code = curl_easy_setopt(curl, CURLOPT_URL, request->getUrl());
         if (code != CURLE_OK) 
         {
             break;
+        }
+        
+        if (request->getUserName()) {
+            code = curl_easy_setopt(curl, CURLOPT_USERNAME, request->getUserName());
+            if (code != CURLE_OK)
+            {
+                break;
+            }
+        }
+        
+        if (request->getUserPassword()) {
+            code = curl_easy_setopt(curl, CURLOPT_PASSWORD, request->getUserPassword());
+            if (code != CURLE_OK)
+            {
+                break;
+            }
         }
         
         code = curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, request->getUrl());
@@ -289,15 +286,24 @@ int processGetTask(CCHttpRequest *request, write_callback callback, void *stream
             break;
         }
         
+        
+        struct curl_slist *headers = NULL;
+        
+        CCArray* addHeaders = request->getHeaders();
+        
+        for (int i=0;i<addHeaders->count();i++) {
+            addHeaders->objectAtIndex(i);
+            headers = curl_slist_append(headers, ((CCString*)addHeaders->objectAtIndex(i))->getCString());
+        }
+    
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        
         code = curl_easy_perform(curl);
         if (code != CURLE_OK) 
         {
             break;
         }
         
-        /* free the linked list for header data */
-        curl_slist_free_all(cHeaders);
-
         code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, responseCode); 
         if (code != CURLE_OK || *responseCode != 200) 
         {
@@ -323,29 +329,30 @@ int processPostTask(CCHttpRequest *request, write_callback callback, void *strea
             break;
         }
         
-        /* handle custom header data */
-        /* create curl linked list */
-        struct curl_slist *cHeaders=NULL;
-        /* get custom header data (if set) */
-      		std::vector<std::string> headers=request->getHeaders();
-      		if(!headers.empty())
-      		{      			
-        			for(std::vector<std::string>::iterator it=headers.begin();it!=headers.end();it++)
-        			{
-              /* append custom headers one by one */
-          				cHeaders=curl_slist_append(cHeaders,it->c_str());
-        			}
-           /* set custom headers for curl */
-        			code = curl_easy_setopt(curl, CURLOPT_HTTPHEADER, cHeaders);
-        			if (code != CURLE_OK) {
-          				break;
-        			}
-      		}
-              
         code = curl_easy_setopt(curl, CURLOPT_URL, request->getUrl());
         if (code != CURLE_OK) {
             break;
         }
+        
+        code = curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0);
+        code = curl_easy_setopt(curl, CURLOPT_PROGRESSFUNCTION, CCHttpClient::progress);
+    
+        if (request->getUserName()) {
+            code = curl_easy_setopt(curl, CURLOPT_USERNAME, request->getUserName());
+            if (code != CURLE_OK)
+            {
+                break;
+            }
+        }
+        
+        if (request->getUserPassword()) {
+            code = curl_easy_setopt(curl, CURLOPT_PASSWORD, request->getUserPassword());
+            if (code != CURLE_OK)
+            {
+                break;
+            }
+        }
+        
         code = curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
         if (code != CURLE_OK) {
             break;
@@ -366,14 +373,63 @@ int processPostTask(CCHttpRequest *request, write_callback callback, void *strea
         if (code != CURLE_OK) {
             break;
         }
+
+        
+        struct curl_slist *headers = NULL;
+        
+        
+
+        CCArray* addHeaders = request->getHeaders();
+        
+        for (int i=0;i<addHeaders->count();i++) {
+            addHeaders->objectAtIndex(i);
+            headers = curl_slist_append(headers, ((CCString*)addHeaders->objectAtIndex(i))->getCString());
+        }
+        
+        //headers = curl_slist_append(headers, "Content-Type: text/xml; charset=utf-8"); // or whatever charset your XML is really using...
+        //headers = curl_slist_append(headers, "Accept: application/json;");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        
+        CCArray* addForms = request->getForms();
+        
+        if (addForms->count()>0) {
+            
+            CCHttpClient::postUpdateNotification(0, HttpUploadStart);
+            
+            struct curl_httppost *formpost = NULL;
+            struct curl_httppost *lastptr=NULL;
+            
+            for (int i=0;i<addForms->count();i++) {
+                
+                CCForm *addForm = (CCForm *)addForms->objectAtIndex(i);
+                
+                if (addForm->getType()==FormDataTypeImage) {
+                    
+                    curl_formadd(&formpost, &lastptr,
+                                 CURLFORM_COPYNAME, addForm->getName(),
+                                 CURLFORM_FILE, addForm->getValue(),
+                                 CURLFORM_END);
+                
+                } else if (addForm->getType()==FormDataTypeVar) {
+                    
+                    curl_formadd(&formpost, &lastptr,
+                                 CURLFORM_COPYNAME, addForm->getName(),
+                                 CURLFORM_COPYCONTENTS, addForm->getValue(),
+                                 CURLFORM_END);
+                    
+                }
+
+            }
+            
+            curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+            
+        }
+            
         code = curl_easy_perform(curl);
         if (code != CURLE_OK) {
             break;
         }
         
-        /* free the linked list for header data */
-        curl_slist_free_all(cHeaders);
-
         code = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, responseCode); 
         if (code != CURLE_OK || *responseCode != 200) {
             code = CURLE_HTTP_RETURNED_ERROR;
@@ -382,6 +438,8 @@ int processPostTask(CCHttpRequest *request, write_callback callback, void *strea
     if (curl) {
         curl_easy_cleanup(curl);
     }
+    
+    CCHttpClient::postUpdateNotification(0, HttpUploadEnd);
     
     return (code == CURLE_OK ? 0 : 1);    
 }
@@ -398,9 +456,9 @@ CCHttpClient* CCHttpClient::getInstance()
 
 void CCHttpClient::destroyInstance()
 {
-    CC_ASSERT(s_pHttpClient);
-    CCDirector::sharedDirector()->getScheduler()->unscheduleSelector(schedule_selector(CCHttpClient::dispatchResponseCallbacks), s_pHttpClient);
-    s_pHttpClient->release();
+    CCDirector::sharedDirector()->getScheduler()->unscheduleSelector(schedule_selector(CCHttpClient::dispatchResponseCallbacks), 
+                                                                     CCHttpClient::getInstance());
+    CC_SAFE_RELEASE_NULL(s_pHttpClient);
 }
 
 CCHttpClient::CCHttpClient()
@@ -420,7 +478,7 @@ CCHttpClient::~CCHttpClient()
         sem_post(s_pSem);
     }
     
-    s_pHttpClient = NULL;
+    CCDirector::sharedDirector()->getScheduler()->unscheduleSelector(schedule_selector(CCHttpClient::dispatchResponseCallbacks), this);
 }
 
 //Lazy create semaphore & mutex & thread

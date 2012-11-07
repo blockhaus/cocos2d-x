@@ -65,6 +65,7 @@ THE SOFTWARE.
 #include "cocoa/CCSet.h"
 #include "cocoa/CCAutoreleasePool.h"
 #include "cocoa/CCInteger.h"
+#include "cocoa/CCNumber.h"
 #include "cocoa/CCString.h"
 #include "cocoa/CCNS.h"
 #include "cocoa/CCZone.h"
@@ -127,6 +128,7 @@ THE SOFTWARE.
 #include "platform/CCPlatformMacros.h"
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
+    #include "platform/ios/MECameraStream.h"
     #include "platform/ios/CCAccelerometer.h"
     #include "platform/ios/CCApplication.h"
     #include "platform/ios/CCEGLView.h"
@@ -135,6 +137,7 @@ THE SOFTWARE.
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_IOS
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    #include "platform/android/MECameraStream.h"
     #include "platform/android/CCAccelerometer.h"
     #include "platform/android/CCApplication.h"
     #include "platform/android/CCEGLView.h"

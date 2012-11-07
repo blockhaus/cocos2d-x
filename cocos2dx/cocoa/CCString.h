@@ -144,9 +144,17 @@ public:
      *          it means that you needn't do a release operation unless you retain it.
      */
     static CCString* createWithContentsOfFile(const char* pszFileName);
+    
+    
+    
+    
+    void replaceAll(const std::string& from, const std::string& to);
 
 private:
-
+    
+    bool replace(std::string& str, const std::string& from, const std::string& to);
+    void replaceAll(std::string& str, const std::string& from, const std::string& to);
+    
     /** only for internal use */
     bool initWithFormatAndValist(const char* format, va_list ap);
 

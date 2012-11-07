@@ -58,6 +58,8 @@ CCScrollView::CCScrollView()
 , m_pTouches(NULL)
 , m_fMinScale(0.0f)
 , m_fMaxScale(0.0f)
+, m_fPagingEnabeld(false)
+, m_fPagingFocus(1)
 {
 
 }
@@ -364,17 +366,110 @@ void CCScrollView::relocateContainer(bool animated)
 
 CCPoint CCScrollView::maxContainerOffset()
 {
-    return ccp(0.0f, 0.0f);
+    CCPoint max = ccp(0.0f, 0.0f);
+    //CCLog("max1: %f %f",max.x,max.y);
+    if (m_tViewSize.height<m_pContainer->getContentSize().height*m_pContainer->getScaleY()) {
+        //max.y = -(m_pContainer->getContentSize().height*m_pContainer->getScaleY() - m_tViewSize.height);
+    }
+    //CCLog("max2: %f %f",max.x,max.y);
+    return max;
 }
 
 CCPoint CCScrollView::minContainerOffset()
 {
-    return ccp(m_tViewSize.width - m_pContainer->getContentSize().width*m_pContainer->getScaleX(), 
-               m_tViewSize.height - m_pContainer->getContentSize().height*m_pContainer->getScaleY());
+    CCPoint min = ccp(m_tViewSize.width - m_pContainer->getContentSize().width*m_pContainer->getScaleX(),
+                      m_tViewSize.height - m_pContainer->getContentSize().height*m_pContainer->getScaleY());
+    
+    //CCLog("min1: %f %f",min.x,min.y);
+    if (min.x>0) {
+        min.x = 0;
+    }
+    if (min.y>0) {
+        //min.y = -(m_pContainer->getContentSize().height*m_pContainer->getScaleY() - m_tViewSize.height);
+    }
+    //CCLog("min2: %f %f",min.x,min.y);
+    return min;
+}
+
+void CCScrollView::setPagingFocusToIndex(int idx)
+{
+    
+    int toSegment = -idx;
+    int sizex=(int)(m_pContainer->getContentSize().width/m_fPagingSize.width);
+    
+    if (toSegment>0) {
+		toSegment=0;
+	}
+	if (toSegment<-(sizex-1)) {
+		toSegment=-(sizex-1);
+	}
+    
+    m_fPagingFocus = toSegment;
+    
+    float centerCellOffset = (this->getViewSize().width-m_fPagingSize.width)*0.5;
+    float toPos=(float)(m_fPagingFocus*m_fPagingSize.width)+centerCellOffset;
+    
+    CCPoint currentPosition = m_pContainer->getPosition();
+    //m_pContainer->setPosition(ccp(toPos,currentPosition.y));
+    
+    
+    
+
+    if (m_pDelegate != NULL)
+    {
+        m_pDelegate->scrollViewDidChangeFocus(abs(toSegment));
+    }
+    
+    this->setContentOffset(ccp(toPos,currentPosition.y),false);
+    this->setContentOffsetInDuration(ccp(toPos,currentPosition.y),0.1);
+    
+    //this->deaccelerateScrolling(0.01);
+    
+    //CCLog("idx:%i %f",toSegment,toPos);
+    //CCLog("pos:%f %f",this->getPosition().x,this->getPosition().y);
 }
 
 void CCScrollView::deaccelerateScrolling(float dt)
 {
+    
+    
+    //CCLog("pos:%f %f",m_pContainer->getPosition().x,m_pContainer->getPosition().y);
+	
+    
+    float centerCellOffset = (this->getViewSize().width-m_fPagingSize.width)*0.5;
+    
+    int toSegment;
+    if (m_tScrollDistance.x>0) {
+        toSegment=(int)((m_pContainer->getPosition().x-centerCellOffset)/m_fPagingSize.width);
+    } else {
+        toSegment=(int)((m_pContainer->getPosition().x-centerCellOffset-m_fPagingSize.width)/m_fPagingSize.width);
+    }
+
+	int sizex=(int)(m_pContainer->getContentSize().width/m_fPagingSize.width);
+
+	if (toSegment>0) {
+		toSegment=0;
+	}
+	if (toSegment<-(sizex-1)) {
+		toSegment=-(sizex-1);
+	}
+    
+    if (m_fPagingFocus!=toSegment) {
+        
+        m_fPagingFocus = toSegment;
+        
+        m_pDelegate->scrollViewDidChangeFocus(abs(toSegment));
+    }
+    
+	float toPos=(float)(toSegment*m_fPagingSize.width)+centerCellOffset;
+    
+    //CCLog("m_fPagingFocus: %i %i",m_fPagingFocus,toSegment);
+    
+   
+    
+	float moveDifference = toPos-m_pContainer->getPosition().x;
+    
+    
     if (m_bDragging)
     {
         this->unschedule(schedule_selector(CCScrollView::deaccelerateScrolling));
@@ -405,15 +500,33 @@ void CCScrollView::deaccelerateScrolling(float dt)
     
     m_tScrollDistance     = ccpSub(m_tScrollDistance, ccp(newX - m_pContainer->getPosition().x, newY - m_pContainer->getPosition().y));
     m_tScrollDistance     = ccpMult(m_tScrollDistance, SCROLL_DEACCEL_RATE);
+    
+    if (m_fPagingEnabeld) {
+        m_tScrollDistance = ccp(moveDifference*0.1,0);
+    }
+    
     this->setContentOffset(ccp(newX,newY));
     
-    if ((fabsf(m_tScrollDistance.x) <= SCROLL_DEACCEL_DIST &&
-         fabsf(m_tScrollDistance.y) <= SCROLL_DEACCEL_DIST) ||
-        newX == maxInset.x || newX == minInset.x ||
-        newY == maxInset.y || newY == minInset.y)
-    {
-        this->unschedule(schedule_selector(CCScrollView::deaccelerateScrolling));
-        this->relocateContainer(true);
+    
+    if (m_fPagingEnabeld) {
+		//NSLog(@"cddcdc");
+		if (abs(moveDifference)<1) {
+            this->setContentOffset(ccp(toPos,0));
+			this->unschedule(schedule_selector(CCScrollView::deaccelerateScrolling));
+            this->relocateContainer(true);
+
+		}
+	} else {
+        
+        if ((fabsf(m_tScrollDistance.x) <= SCROLL_DEACCEL_DIST &&
+             fabsf(m_tScrollDistance.y) <= SCROLL_DEACCEL_DIST) ||
+            newX == maxInset.x || newX == minInset.x ||
+            newY == maxInset.y || newY == minInset.y)
+        {
+            this->unschedule(schedule_selector(CCScrollView::deaccelerateScrolling));
+            this->relocateContainer(true);
+        }
+
     }
 }
 
@@ -722,6 +835,14 @@ void CCScrollView::ccTouchCancelled(CCTouch* touch, CCEvent* event)
         m_bDragging = false;    
         m_bTouchMoved = false;
     }
+}
+
+void CCScrollView::setPagingEnabeld( bool pPagingEnabeld )
+{
+    
+    m_fPagingEnabeld = pPagingEnabeld;
+    this->setContentOffset(this->minContainerOffset());
+
 }
 
 NS_CC_EXT_END
