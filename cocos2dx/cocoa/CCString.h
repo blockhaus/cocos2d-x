@@ -153,13 +153,15 @@ public:
     static void stoupper(std::string& s);
     void convertToUpperCase();
 
+    bool initWithFormatAndValist(const char* format, va_list ap);
+    
 private:
     
     bool replace(std::string& str, const std::string& from, const std::string& to);
     void replaceAll(std::string& str, const std::string& from, const std::string& to);
     
     /** only for internal use */
-    bool initWithFormatAndValist(const char* format, va_list ap);
+    //bool initWithFormatAndValist(const char* format, va_list ap);
 
 public:
     std::string m_sString;
