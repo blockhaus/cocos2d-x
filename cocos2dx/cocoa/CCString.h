@@ -149,6 +149,9 @@ public:
     
     
     void replaceAll(const std::string& from, const std::string& to);
+    
+    static void stoupper(std::string& s);
+    void convertToUpperCase();
 
 private:
     

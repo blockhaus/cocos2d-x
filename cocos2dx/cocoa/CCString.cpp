@@ -257,6 +257,22 @@ void CCString::replaceAll(const std::string& from, const std::string& to) {
     
 }
 
+void CCString::stoupper(std::string& s)
+{
+    std::string::iterator i = s.begin();
+    std::string::iterator end = s.end();
+    
+    while (i != end) {
+        *i = std::toupper((unsigned char)*i);
+        ++i;
+    }
+}
+
+void CCString::convertToUpperCase()
+{
+    stoupper(m_sString);
+}
+
 
 
 NS_CC_END
