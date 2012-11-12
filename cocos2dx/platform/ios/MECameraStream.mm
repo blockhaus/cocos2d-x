@@ -92,8 +92,8 @@ void MECameraStream::end()
 
 bool MECameraStream::hasCamera()
 {
-    //return false;
-    return static_hasCamera();
+    return false;
+    //return static_hasCamera();
 }
 
 void MECameraStream::takePicture()
