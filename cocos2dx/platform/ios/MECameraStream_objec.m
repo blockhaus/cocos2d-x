@@ -271,6 +271,11 @@ static MECameraStream_objec *sharedStream_=nil;
 	return result;
 }
 
+- (BOOL)hasCamera
+{
+    return [UIImagePickerController isSourceTypeAvailable: UIImagePickerControllerSourceTypeCamera];
+}
+
 - (void)takePicture
 {
     

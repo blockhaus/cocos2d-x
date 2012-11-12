@@ -17,6 +17,10 @@ static void static_end()
     //[MECameraStreamDisptacher end];
 }
 
+static bool static_hasCamera() {
+    return [[MECameraStreamDisptacher sharedSream] hasCamera];
+}
+
 static void static_takePicture()
 {
     [[MECameraStreamDisptacher sharedSream] takePicture];
@@ -84,6 +88,12 @@ void MECameraStream::end()
     }
     
     static_end();
+}
+
+bool MECameraStream::hasCamera()
+{
+    return false;
+    //return static_hasCamera();
 }
 
 void MECameraStream::takePicture()

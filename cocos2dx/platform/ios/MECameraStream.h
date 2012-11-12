@@ -29,6 +29,8 @@ public:
     
     static void end();
     
+    bool hasCamera();
+    
     void takePicture();
     
     void startPreview();

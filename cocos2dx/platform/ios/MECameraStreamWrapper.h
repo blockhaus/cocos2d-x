@@ -23,6 +23,7 @@
 
 + (id) sharedSream;
 - (id) init;
+- (BOOL) hasCamera;
 - (void) takePicture;
 - (void) startPreview;
 - (void) stopPreview;

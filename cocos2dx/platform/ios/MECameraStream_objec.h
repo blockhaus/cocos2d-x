@@ -27,6 +27,7 @@
 
 @property (nonatomic, retain) AVCaptureSession* _session;
 
+- (BOOL) hasCamera;
 - (void) takePicture;
 - (void) startPreview;
 - (void) stopPreview;
