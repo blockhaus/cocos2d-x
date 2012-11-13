@@ -289,9 +289,10 @@ static MECameraStream_objec *sharedStream_=nil;
 	//[stillImageConnection setVideoScaleAndCropFactor:effectiveScale];
 	
     
+    
     [stillImageOutput setOutputSettings:[NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kCMPixelFormat_32BGRA]
 																		forKey:(id)kCVPixelBufferPixelFormatTypeKey]];
-    NSLog(@"start taking picture");
+    NSLog(@"start taking picture - %i - %i - %i",[stillImageConnection isEnabled],[stillImageOutput isCapturingStillImage],[session isRunning]);
     //[stillImageOutput setOutputSettings:[NSDictionary dictionaryWithObject:AVVideoCodecJPEG forKey:AVVideoCodecKey]];
 	
     
@@ -300,6 +301,8 @@ static MECameraStream_objec *sharedStream_=nil;
             if (error) {
                 [self displayErrorOnMainQueue:error withMessage:@"Take picture failed"];
             } else {
+                
+                [self performSelectorOnMainThread:@selector(stopPreview) withObject:nil waitUntilDone:FALSE];
                 
                 UIImage *original=[[UIImage imageWithCGImage:[self imageFromSampleBuffer:imageDataSampleBuffer]] retain];
             
@@ -318,12 +321,14 @@ static MECameraStream_objec *sharedStream_=nil;
                 [original release];
                 
                 [delegate didTakePicture:storePath];
+                
+                
 
             }
         }
     ];
     
-    [self stopPreview];
+    //[self stopPreview];
 }
 
 
