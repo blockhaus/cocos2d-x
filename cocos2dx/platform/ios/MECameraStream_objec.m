@@ -302,7 +302,7 @@ static MECameraStream_objec *sharedStream_=nil;
                 [self displayErrorOnMainQueue:error withMessage:@"Take picture failed"];
             } else {
                 
-                [self performSelectorOnMainThread:@selector(stopPreview) withObject:nil waitUntilDone:FALSE];
+                
                 
                 UIImage *original=[[UIImage imageWithCGImage:[self imageFromSampleBuffer:imageDataSampleBuffer]] retain];
             
@@ -322,7 +322,7 @@ static MECameraStream_objec *sharedStream_=nil;
                 
                 [delegate didTakePicture:storePath];
                 
-                
+                [self performSelectorOnMainThread:@selector(stopPreview) withObject:nil waitUntilDone:FALSE];
 
             }
         }
