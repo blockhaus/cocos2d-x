@@ -188,13 +188,13 @@ static MECameraStream_objec *sharedStream_=nil;
     
     if (size==320.0) {
         //iPhone 3GS
-        [session setSessionPreset:AVCaptureSessionPresetPhoto];
+        [session setSessionPreset:AVCaptureSessionPreset640x480];
     } else if (size==640.0) {
         //iPhone 4/4s/5
         [session setSessionPreset:AVCaptureSessionPreset640x480];
     } else if (size==768.0 || size==1536.0) {
         //IPad
-        [session setSessionPreset:AVCaptureSessionPresetPhoto];
+        [session setSessionPreset:AVCaptureSessionPresetMedium];
     }
 
 }
