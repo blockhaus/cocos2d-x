@@ -312,7 +312,7 @@ static MECameraStream_objec *sharedStream_=nil;
                 UIImage *cropedImage = [original imageCroppedToFitSize:newSize];
                 
                 NSData *data = UIImageJPEGRepresentation(cropedImage, 0.8);
-                NSString *storePath = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"camera_image.jpg"];
+                NSString *storePath = [[NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"camera_image.jpg"];
                 NSLog(@"save to path:%@",storePath);
                 if(![data writeToFile:storePath atomically:YES]) {
                     NSLog(@"COULD NOT STORE FILE5 %@", storePath);
