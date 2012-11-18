@@ -306,7 +306,7 @@ bool CCFileUtils::isPopupNotify()
 {
     return s_bPopupNotify;
 }
-
+/*
 std::string CCFileUtils::getWriteablePath()
 {
     // save to document folder
@@ -316,8 +316,8 @@ std::string CCFileUtils::getWriteablePath()
     strRet.append("/");
     return strRet;
 }
-
-std::string CCFileUtils::getProtectedWriteablePath()
+*/
+std::string CCFileUtils::getWriteablePath()
 {
     // save to document folder
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);

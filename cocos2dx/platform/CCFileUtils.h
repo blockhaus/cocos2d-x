@@ -94,7 +94,7 @@ public:
     std::string getWriteablePath();
     
     
-    std::string getProtectedWriteablePath();
+    //std::string getProtectedWriteablePath();
 
     /**
     @brief Set/Get whether pop-up a message box when the image load failed
