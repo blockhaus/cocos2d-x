@@ -31,6 +31,7 @@
 #include <semaphore.h>
 #include <errno.h>
 
+
 #include "curl/curl.h"
 
 NS_CC_EXT_BEGIN
@@ -252,6 +253,20 @@ int processGetTask(CCHttpRequest *request, write_callback callback, void *stream
             break;
         }
         
+        // add SSL certificates
+        const char *certpath = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath("cacert.crt");
+        code = curl_easy_setopt(curl, CURLOPT_CAINFO, certpath);
+        if (code != CURLE_OK)
+        {
+            break;
+        }
+
+        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        if (code != CURLE_OK)
+        {
+            break;
+        }
+        
         if (request->getUserName()) {
             code = curl_easy_setopt(curl, CURLOPT_USERNAME, request->getUserName());
             if (code != CURLE_OK)
@@ -331,6 +346,20 @@ int processPostTask(CCHttpRequest *request, write_callback callback, void *strea
         
         code = curl_easy_setopt(curl, CURLOPT_URL, request->getUrl());
         if (code != CURLE_OK) {
+            break;
+        }
+        
+        // add SSL certificates
+        const char *certpath = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath("cacert.crt");
+        code = curl_easy_setopt(curl, CURLOPT_CAINFO, certpath);
+        if (code != CURLE_OK)
+        {
+            break;
+        }
+        
+        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        if (code != CURLE_OK)
+        {
             break;
         }
         
