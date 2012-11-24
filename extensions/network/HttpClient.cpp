@@ -254,14 +254,17 @@ int processGetTask(CCHttpRequest *request, write_callback callback, void *stream
         }
         
         // add SSL certificates
+        /*
         const char *certpath = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath("cacert.crt");
         code = curl_easy_setopt(curl, CURLOPT_CAINFO, certpath);
         if (code != CURLE_OK)
         {
             break;
         }
-
-        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        */
+        // certificate not needed if CURLOPT_SSL_VERIFYPEER 0
+        
+        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         if (code != CURLE_OK)
         {
             break;
@@ -349,15 +352,22 @@ int processPostTask(CCHttpRequest *request, write_callback callback, void *strea
             break;
         }
         
+    
         // add SSL certificates
+        
+        /*
         const char *certpath = CCFileUtils::sharedFileUtils()->fullPathFromRelativePath("cacert.crt");
+        CCLog("certpath:%s",certpath);
+        
         code = curl_easy_setopt(curl, CURLOPT_CAINFO, certpath);
         if (code != CURLE_OK)
         {
             break;
         }
+        */
+        // certificate not needed if CURLOPT_SSL_VERIFYPEER 0
         
-        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1);
+        code = curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
         if (code != CURLE_OK)
         {
             break;
