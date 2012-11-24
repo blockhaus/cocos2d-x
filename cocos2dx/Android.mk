@@ -6,6 +6,8 @@ LOCAL_MODULE := cocos2dx_static
 
 LOCAL_MODULE_FILENAME := libcocos2d
 
+LOCAL_CFLAGS := -Wno-psabi
+
 LOCAL_SRC_FILES := \
 CCConfiguration.cpp \
 CCDrawingPrimitives.cpp \
@@ -78,6 +80,7 @@ platform/platform.cpp \
 platform/CCEGLViewProtocol.cpp \
 platform/android/CCEGLView.cpp \
 platform/android/CCAccelerometer.cpp \
+platform/android/MECameraStream.cpp \
 platform/android/CCApplication.cpp \
 platform/android/CCCommon.cpp \
 platform/android/CCFileUtils.cpp \
@@ -86,6 +89,7 @@ platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxBitmap.cpp \
 platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxHelper.cpp \
 platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxRenderer.cpp \
 platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxAccelerometer.cpp \
+platform/android/jni/Java_org_cocos2dx_lib_Cocos2dxCamera.cpp \
 platform/android/jni/JniHelper.cpp \
 platform/android/jni/IMEJni.cpp \
 platform/android/jni/TouchesJni.cpp \

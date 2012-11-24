@@ -37,6 +37,10 @@ namespace cocos2d
      
     }
     
+    static bool static_hasCamera() {
+        return false;
+    }
+    
     static void static_takePicture()
     {
       
@@ -45,12 +49,12 @@ namespace cocos2d
     static void static_startPreview()
     {
        
-        startCameraPreviewJNI();
+        //startCameraPreviewJNI();
     }
     
     static void static_stopPreview()
     {
-        stopCameraPreviewJNI();
+        //stopCameraPreviewJNI();
     }
     
     
@@ -90,6 +94,12 @@ namespace cocos2d
         }
         
         static_end();
+    }
+    
+    bool MECameraStream::hasCamera()
+    {
+        //return false;
+        return static_hasCamera();
     }
     
     void MECameraStream::takePicture()

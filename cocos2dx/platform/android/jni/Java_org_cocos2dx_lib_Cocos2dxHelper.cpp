@@ -183,4 +183,8 @@ extern "C" {
         }
         
     }
+    
+    void setAccelerometerIntervalJNI(float interval) {
+    
+    }
 }

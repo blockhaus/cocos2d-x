@@ -36,11 +36,11 @@ namespace   cocos2d {
         MECameraStream();
         ~MECameraStream();
     
-
-
         static MECameraStream* sharedStream();
         
         static void end();
+        
+        bool hasCamera();
         
         void takePicture();
         
