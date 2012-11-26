@@ -26,7 +26,9 @@ package org.cocos2dx.lib;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import android.graphics.Point;
 import android.opengl.GLSurfaceView;
+import java.util.*;
 
 public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 	// ===========================================================
@@ -45,6 +47,9 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 	private long mLastTickInNanoSeconds;
 	private int mScreenWidth;
 	private int mScreenHeight;
+	private Map<Integer,Point> lockedTouchPoints = new HashMap<Integer, Point>();
+	
+	private final static float TOUCHTHRESHHOLD = 5.0f;
 
 	// ===========================================================
 	// Constructors
@@ -113,19 +118,71 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 	private static native void nativeOnResume();
 
 	public void handleActionDown(final int pID, final float pX, final float pY) {
+		
+		Point newPoint = new Point();
+		newPoint.x = (int) pX;
+		newPoint.y = (int) pY;
+		lockedTouchPoints.put(pID,newPoint);
+		
 		Cocos2dxRenderer.nativeTouchesBegin(pID, pX, pY);
 	}
 
 	public void handleActionUp(final int pID, final float pX, final float pY) {
 		Cocos2dxRenderer.nativeTouchesEnd(pID, pX, pY);
+		if (lockedTouchPoints.containsKey(pID)) {
+			lockedTouchPoints.remove(pID);
+		}
 	}
 
 	public void handleActionCancel(final int[] pIDs, final float[] pXs, final float[] pYs) {
+		
+		for (int pID : pIDs) {
+			if (lockedTouchPoints.containsKey(pID)) {
+				lockedTouchPoints.remove(pID);
+			}
+		}
+			
 		Cocos2dxRenderer.nativeTouchesCancel(pIDs, pXs, pYs);
 	}
 
 	public void handleActionMove(final int[] pIDs, final float[] pXs, final float[] pYs) {
-		Cocos2dxRenderer.nativeTouchesMove(pIDs, pXs, pYs);
+		
+		
+		int i=0;
+		for (int pID : pIDs) {
+			if (lockedTouchPoints.containsKey(pID)) {
+				Point lockedPoint = lockedTouchPoints.get(pID);
+				float length = (float) Math.sqrt((float) Math.pow((lockedPoint.x-pXs[i]),2.0)+(float) Math.pow((lockedPoint.y-pYs[i]),2.0));
+				if (length>TOUCHTHRESHHOLD) {
+					lockedTouchPoints.remove(pID);
+				}
+			}
+			i++;
+		}
+		int count = 0;
+		for (int pID : pIDs) {
+			if (!lockedTouchPoints.containsKey(pID)) {
+				count++;
+			}
+		}
+		
+		final int[] newIDs = new int[count];
+		final float[] newXs = new float[count];
+		final float[] newYs = new float[count];
+		
+		i=0;
+		int newPos=0;
+		for (int pID : pIDs) {
+			if (!lockedTouchPoints.containsKey(pID)) {
+				newIDs[newPos]=pIDs[i];
+				newXs[newPos]=pXs[i];
+				newYs[newPos]=pYs[i];
+				newPos++;
+			}
+			i++;
+		}
+		
+		Cocos2dxRenderer.nativeTouchesMove(newIDs, newXs, newYs);
 	}
 
 	public void handleKeyDown(final int pKeyCode) {
