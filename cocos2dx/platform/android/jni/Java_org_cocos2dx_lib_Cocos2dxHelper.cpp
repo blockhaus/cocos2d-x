@@ -184,6 +184,18 @@ extern "C" {
         
     }
     
+    bool hasCameraJNI() {
+    	JniMethodInfo t;
+    	bool hasCamera;
+
+    	if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "hasCamera", "()Z")) {
+			hasCamera = t.env->CallStaticBooleanMethod(t.classID, t.methodID);
+			t.env->DeleteLocalRef(t.classID);
+		}
+
+    	return hasCamera;
+    }
+
     void setAccelerometerIntervalJNI(float interval) {
     
     }

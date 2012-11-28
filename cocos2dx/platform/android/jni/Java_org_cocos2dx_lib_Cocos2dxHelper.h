@@ -37,6 +37,7 @@ extern "C" {
     extern const char * getPackageNameJNI();
     extern void enableAccelerometerJNI();
     extern void disableAccelerometerJNI();
+    extern bool hasCameraJNI();
     extern void startCameraPreviewJNI();
     extern void stopCameraPreviewJNI();
     extern void setAccelerometerIntervalJNI(float interval);
