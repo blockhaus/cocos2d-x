@@ -31,6 +31,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
+import android.view.SurfaceHolder;
 
 public class Cocos2dxHelper {
 	// ===========================================================
@@ -219,6 +220,10 @@ public class Cocos2dxHelper {
 
 	public static boolean hasCamera() {
 		return Cocos2dxHelper.sCocos2dxCamera.hasCamera();
+	}
+	
+	public static void setCameraPreviewSurface(SurfaceHolder sv) {
+		Cocos2dxHelper.sCocos2dxCamera.setPreviewSurface(sv);
 	}
 
 	public static void onResume() {
