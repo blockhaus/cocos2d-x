@@ -1,45 +1,43 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
-
-http://www.cocos2d-x.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ * Copyright (c) 2010-2011 cocos2d-x.org
+ * 
+ * http://www.cocos2d-x.org
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
 
-import android.content.res.Configuration;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.ErrorCallback;
-import android.hardware.Camera.Parameters;
+import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
-
-
 import android.util.Log;
+import android.view.SurfaceView;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 
-//@SuppressWarnings("unused")
+// @SuppressWarnings("unused")
 public class Cocos2dxCamera {
 	// ===========================================================
 	// Constants
@@ -47,138 +45,272 @@ public class Cocos2dxCamera {
 
 	private static final String TAG = Cocos2dxCamera.class.getSimpleName();
 
+	/**
+	 * Maximum number of pixels that are supported for camera preview width.
+	 */
+	private static final int MAX_CAMERA_PREVIEW_WIDTH = 1024;
+
+	/**
+	 * Maximum number of pixels that are supported for camera preview height.
+	 */
+	private static final int MAX_CAMERA_PREVIEW_HEIGHT = 1024;
+
+	/**
+	 * Camera ID used when device has no suitable camera;
+	 */
+	private static final int INVALID_CAMERA_ID = -1;
+
+	/**
+	 * Internal const for using YV12 preview format.
+	 */
+	private static final int PREVIEW_FORMAT_YV12 = 0;
+
+	/**
+	 * Internal const for using NV21 preview format.
+	 */
+	private static final int PREVIEW_FORMAT_NV21 = 1;
+
+	/**
+	 * Internal const for unsupported preview format.
+	 */
+	private static final int PREVIEW_FORMAT_UNSUPPORTED = -1;
+
 	// ===========================================================
 	// Fields
 	// ===========================================================
 
-	private static final int MIN_FRAME_WIDTH = 240;
-	  private static final int MIN_FRAME_HEIGHT = 240;
-	  private static final int MAX_FRAME_WIDTH = 600;
-	  private static final int MAX_FRAME_HEIGHT = 400;
+	/**
+	 * Camera device once opened.
+	 */
+	private Camera mCamera;
 
-	  //private final CameraConfigurationManager configManager;
-	  private Camera	mCamera;
-	  private byte[]	mBuffer;
-	  private int dataBufferSize;
-	  //private AutoFocusManager autoFocusManager;
-	  private Rect framingRect;
-	  private Rect framingRectInPreview;
-	  private boolean initialized;
-	  private boolean previewing;
-	  private int requestedFramingRectWidth;
-	  private int requestedFramingRectHeight;
+	/**
+	 * ID of the camera to use. Or -1 if there is no suitable camera.
+	 */
+	private int mCameraId;
+
+	private int mCameraWidth, mCameraHeight;
+
+	private int mPreviewFormat;
+
+	/**
+	 * The preview format constant passed to the underlying converter.
+	 */
+	private int mUsedPreviewFormat;
+
+	private SurfaceView mDummyView;
 
 	// ===========================================================
 	// Constructors
 	// ===========================================================
 
-	public Cocos2dxCamera() {
-		
-		startVideo();
-
-
+	public Cocos2dxCamera(Context pContext) {
+		this.mCamera = null;
+		this.mUsedPreviewFormat = PREVIEW_FORMAT_UNSUPPORTED;
+		this.mDummyView = this.createDummySurfaceView(pContext);
+		this.mCameraId = this.setupCamera(pContext);
 	}
 
-    public void startVideo() {
-        //SurfaceHolder videoCaptureViewHolder = null;
-        try {
-            mCamera = Camera.open();
-            Log.e("CameraTest", "Camera Opend");
-        } catch (RuntimeException e) {
-            Log.e("CameraTest", "Camera Open filed");
-            return;
-        }
-        mCamera.setErrorCallback(new ErrorCallback() {
-            public void onError(int error, Camera camera) {
-            }
-        }); 
-        Camera.Parameters parameters = mCamera.getParameters();
-        parameters.setPreviewFrameRate(35);
-        parameters.setPreviewFpsRange(35000,35000);
-      
-        List<int[]> supportedPreviewFps=parameters.getSupportedPreviewFpsRange();
-        Iterator<int[]> supportedPreviewFpsIterator=supportedPreviewFps.iterator();
-        while(supportedPreviewFpsIterator.hasNext()){
-            int[] tmpRate=supportedPreviewFpsIterator.next();
-            StringBuffer sb=new StringBuffer();
-            sb.append("supportedPreviewRate: ");
-            for(int i=tmpRate.length,j=0;j<i;j++){
-                sb.append(tmpRate[j]+", ");
-            }
-            Log.v("CameraTest",sb.toString());
-        }
+	// =============================================================================
+	// Public Methods
+	// =============================================================================
 
-        List<Size> supportedPreviewSizes=parameters.getSupportedPreviewSizes();
-        Iterator<Size> supportedPreviewSizesIterator=supportedPreviewSizes.iterator();
-        while(supportedPreviewSizesIterator.hasNext()){
-            Size tmpSize=supportedPreviewSizesIterator.next();
-            Log.v("CameraTest","supportedPreviewSize.width = "+tmpSize.width+"supportedPreviewSize.height = "+tmpSize.height);
-        }
+	public boolean isRunning() {
+		return this.mCamera != null;
+	}
 
-        mCamera.setParameters(parameters);
-        /*
-        if (null != mVideoCaptureView)
-            videoCaptureViewHolder = mVideoCaptureView.getHolder();
-        try {
-            mCamera.setPreviewDisplay(videoCaptureViewHolder);
-        } catch (Throwable t) {
-        }
-        */
-        Log.v("CameraTest","Camera PreviewFrameRate = "+mCamera.getParameters().getPreviewFrameRate());
-        Size previewSize=mCamera.getParameters().getPreviewSize();
-        dataBufferSize=(int)(previewSize.height*previewSize.width*(ImageFormat.getBitsPerPixel(mCamera.getParameters().getPreviewFormat())/8.0));
-        mBuffer = new byte[dataBufferSize];
-        mCamera.addCallbackBuffer(mBuffer);
+	public boolean hasCamera() {
+		return this.mCameraId != INVALID_CAMERA_ID;
+	}
 
-        mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
-            private long timestamp=0;
-            public synchronized void onPreviewFrame(byte[] data, Camera camera) {
-                Log.v("CameraTest","Time Gap = "+(System.currentTimeMillis()-timestamp));
-                timestamp=System.currentTimeMillis();
-                
-                camera.addCallbackBuffer(mBuffer);
-                
-                try{
-                    //camera.addCallbackBuffer(data);
-                	Size previewSize=camera.getParameters().getPreviewSize();
-                	//Cocos2dxCamera.onUpdateCameraFrame(data, previewSize.width, previewSize.height);
-                	
-                } catch (Exception e) {
-                    Log.e("CameraTest", "addCallbackBuffer error");
-                    return;
-                }
-                
-                return;
-            }
-        });
-        try {
-            mCamera.startPreview();
-        } catch (Throwable e) {
-            mCamera.release();
-            mCamera = null;
-            return;
-        }
-    }
-    public void stopVideo() {
-        if(null==mCamera)
-            return;
-        try {
-            mCamera.stopPreview();
-            mCamera.setPreviewDisplay(null);
-            mCamera.setPreviewCallbackWithBuffer(null);
-            mCamera.release();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-        mCamera = null;
-    }
-    public void finish(){
-        stopVideo();
-        //super.finish();
-    };
-    
-    public static native void onUpdateCameraFrame(final byte[] pX, final float width, final float height);
+	public void startCameraPreview() {
+		// Try to open camera
+		try {
+			this.mCamera = Camera.open(this.mCameraId);
+		} catch (Exception ex) {
+			Log.i(TAG, Cocos2dxCamera.class.toString()
+					+ " could not open the camera device. Device busy?");
+		}
 
-    
+		if (mCamera != null) {
+			try {
+				// Setup camera with pre-configured parameters
+				Camera.Parameters params = this.mCamera.getParameters();
+
+				params.setPreviewFormat(this.mPreviewFormat);
+				params.setPreviewSize(this.mCameraWidth, this.mCameraHeight);
+				this.mCamera.setParameters(params);
+
+				this.mCamera.setPreviewDisplay(this.mDummyView.getHolder());
+
+				final int dataBufferSize = (int) (this.mCameraWidth
+						* this.mCameraHeight * (ImageFormat.getBitsPerPixel(this.mPreviewFormat) / 8.0));
+
+				// Create buffer
+				final byte[] previewBuffer = new byte[dataBufferSize];
+				// Pass buffer to camera for preview
+				this.mCamera.addCallbackBuffer(previewBuffer);
+
+				// Register callback to receive filled preview buffer
+				this.mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
+
+					@Override
+					public void onPreviewFrame(byte[] data, Camera camera) {
+						// Pass preview data to native code
+						Cocos2dxCamera.this.onUpdateCameraFrame(data, Cocos2dxCamera.this.mCameraWidth, Cocos2dxCamera.this.mCameraHeight, Cocos2dxCamera.this.mUsedPreviewFormat);
+						// Return the frame to the camera
+						camera.addCallbackBuffer(data);
+					}
+				});
+
+				// Now (after setup) start preview mode
+				this.mCamera.startPreview();
+
+			} catch (Exception ex) {
+				Log.e(TAG, Cocos2dxCamera.class.toString()
+						+ " could not start camera preview.", ex);
+			}
+		}
+	}
+
+	private int setupCamera(Context pContext) {
+		int cameraId = INVALID_CAMERA_ID;
+
+		if (pContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
+			// Get number of available cams
+			final int numberOfCameras = Camera.getNumberOfCameras();
+
+			CameraInfo cameraInfo = new CameraInfo();
+			Camera cam = null;
+
+			// Iterate through all cams (label this "cameraLoop")
+			cameraLoop: for (int i = 0; i <= numberOfCameras; i++) {
+				// Get camera info
+				Camera.getCameraInfo(i, cameraInfo);
+				// Skip cam if it is frontfacing
+				if (cameraInfo.facing == CameraInfo.CAMERA_FACING_FRONT)
+					continue;
+
+				try {
+					// Try to open the camera for further inspection
+					cam = Camera.open(i);
+				} catch (RuntimeException ex) {
+					// Could not open camera. Move on to next.
+					continue cameraLoop;
+				}
+
+				Camera.Parameters params = cam.getParameters();
+
+				// Init preview format as not supported
+				this.mUsedPreviewFormat = PREVIEW_FORMAT_UNSUPPORTED;
+
+				// Get the preview image formats supported
+				previewFormatLoop: for (int previewFormat : params.getSupportedPreviewFormats()) {
+					// Check if preview format is supported
+					if (previewFormat == ImageFormat.NV21) {
+						// Choose supported preview format NV21
+						this.mUsedPreviewFormat = PREVIEW_FORMAT_NV21;
+						this.mPreviewFormat = previewFormat;
+						break previewFormatLoop;
+					} else if (previewFormat == ImageFormat.YV12) {
+						// Choose supported preview format YV12
+						this.mUsedPreviewFormat = PREVIEW_FORMAT_YV12;
+						this.mPreviewFormat = previewFormat;
+						break previewFormatLoop;
+					}
+				}
+
+				// Skip camera if no supported preview format was found
+				if (this.mUsedPreviewFormat == PREVIEW_FORMAT_UNSUPPORTED) {
+					// Release unused camera
+					cam.release();
+					// Skip cams with non supported preview format
+					continue cameraLoop;
+				}
+
+				Size usedSize = null;
+				// Iterate through all supported preview sizes
+				previewSizeLoop: for (Size previewSize : params.getSupportedPreviewSizes()) {
+					// Does the preview size fit into our maximum boundaries?
+					if (previewSize.width < MAX_CAMERA_PREVIEW_WIDTH
+							&& previewSize.height < MAX_CAMERA_PREVIEW_HEIGHT) {
+						// Is this preview size bigger (better) than our last
+						// found?
+						if (usedSize == null
+								|| (usedSize.width < previewSize.width && usedSize.height < previewSize.height)) {
+							usedSize = previewSize;
+							if (usedSize.width == 640 && usedSize.height == 480) {
+								break previewSizeLoop;
+							}
+						}
+					}
+				}
+
+				if (usedSize != null) {
+					// If a size fits, use it.
+					this.mCameraWidth = usedSize.width;
+					this.mCameraHeight = usedSize.height;
+				} else {
+					// Release unused camera
+					cam.release();
+					// If not skip camera.
+					continue cameraLoop;
+				}
+
+				// Release camera
+				cam.release();
+				// Store this camera
+				cameraId = i;
+				// Camera found! Stop searching
+				break cameraLoop;
+			}
+		}
+
+		// Return the found camera ID
+		return cameraId;
+	}
+
+	private SurfaceView createDummySurfaceView(Context pContext) {
+		final SurfaceView surfaceView = new SurfaceView(pContext);
+
+		WindowManager wm = (WindowManager) pContext.getSystemService(Context.WINDOW_SERVICE);
+		LayoutParams params = new WindowManager.LayoutParams(1,1,
+	            WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
+	            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
+	            PixelFormat.TRANSLUCENT); 
+		
+		wm.addView(surfaceView, params);
+
+		surfaceView.setZOrderOnTop(true);
+		surfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+		
+		return surfaceView;
+	}
+
+	public void stopCameraPreview() {
+		if (this.mCamera != null) {
+			try {
+				this.mCamera.stopPreview();
+				this.mCamera.setPreviewDisplay(null);
+				this.mCamera.setPreviewCallbackWithBuffer(null);
+				this.mCamera.release();
+				this.mCamera = null;
+				this.freeNativeResources();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void finish() {
+		stopCameraPreview();
+	};
+
+	// =============================================================================
+	// JNI Methods
+	// =============================================================================
+
+	public native void onUpdateCameraFrame(final byte[] pX, final int width, final int height, final int previewFormat);
+
+	public native void freeNativeResources();
 }

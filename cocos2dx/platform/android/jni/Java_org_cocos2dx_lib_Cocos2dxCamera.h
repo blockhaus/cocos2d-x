@@ -26,13 +26,11 @@ THE SOFTWARE.
 
 #include <string>
 
-//typedef void (*EditBoxCallback)(const char* pText, void* ctx);
+#define CAMERA_PREVIEW_FORMAT_YV12 0
+#define CAMERA_PREVIEW_FORMAT_NV21 1
 
 extern "C"
 {
-
-    extern void startPreviewCameraJNI();
-    extern void stopPreviewCameraJNI();
 
 } // end of extern "C"
 

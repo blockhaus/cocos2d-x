@@ -38,7 +38,7 @@ namespace cocos2d
     }
     
     static bool static_hasCamera() {
-        return false;
+    	return hasCameraJNI();
     }
     
     static void static_takePicture()
@@ -49,12 +49,12 @@ namespace cocos2d
     static void static_startPreview()
     {
        
-        //startCameraPreviewJNI();
+        startCameraPreviewJNI();
     }
     
     static void static_stopPreview()
     {
-        //stopCameraPreviewJNI();
+        stopCameraPreviewJNI();
     }
     
     
@@ -98,8 +98,11 @@ namespace cocos2d
     
     bool MECameraStream::hasCamera()
     {
-        //return false;
-        return static_hasCamera();
+    	bool hasCamera = static_hasCamera();
+
+    	CCLog("has Camera = %d", hasCamera);
+
+        return hasCamera;
     }
     
     void MECameraStream::takePicture()
@@ -109,23 +112,30 @@ namespace cocos2d
     
     void MECameraStream::startPreview()
     {
+    	CCLog("Start");
         static_startPreview();
     }
     
     void MECameraStream::stopPreview()
     {
+    	CCLog("Stop");
         static_stopPreview();
     }
 
     void MECameraStream::setDelegate(MECameraStreamDelegate* pDelegate)
     {
-        static_setDelegate(pDelegate);
+    	CCLog("setDelegate");
+    	m_pCameraStreamDelegate = pDelegate;
     }
 
     void MECameraStream::update(int* rgb, int width, int height)
     {
         if (m_pCameraStreamDelegate) {
-            
+        	unsigned long w = width;
+        	unsigned long h = height;
+        	//CCLog("MECameraStream: %s", rgb);
+
+            m_pCameraStreamDelegate->updateTextureWithSampleBuffer((unsigned char*)rgb, w, h);
         }
     }
 

@@ -1,25 +1,25 @@
 /****************************************************************************
-Copyright (c) 2010-2011 cocos2d-x.org
-
-http://www.cocos2d-x.org
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+ * Copyright (c) 2010-2011 cocos2d-x.org
+ * 
+ * http://www.cocos2d-x.org
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
@@ -50,6 +50,9 @@ public class Cocos2dxHelper {
 
 	private static Cocos2dxHelperListener sCocos2dxHelperListener;
 
+	private static Cocos2dxCamera sCocos2dxCamera;
+	private static boolean sCameraWasPaused;
+
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -68,6 +71,9 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sCocos2dSound = new Cocos2dxSound(pContext);
 		Cocos2dxHelper.sAssetManager = pContext.getAssets();
 		Cocos2dxBitmap.setContext(pContext);
+
+		Cocos2dxHelper.sCocos2dxCamera = new Cocos2dxCamera(pContext);
+		sCameraWasPaused = false;
 	}
 
 	// ===========================================================
@@ -95,10 +101,10 @@ public class Cocos2dxHelper {
 	public static String getCurrentLanguage() {
 		return Locale.getDefault().getLanguage();
 	}
-	
-	public static String getDeviceModel(){
+
+	public static String getDeviceModel() {
 		return Build.MODEL;
-    }
+	}
 
 	public static AssetManager getAssetManager() {
 		return Cocos2dxHelper.sAssetManager;
@@ -108,7 +114,6 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sAccelerometerEnabled = true;
 		Cocos2dxHelper.sCocos2dxAccelerometer.enable();
 	}
-
 
 	public static void setAccelerometerInterval(float interval) {
 		Cocos2dxHelper.sCocos2dxAccelerometer.setInterval(interval);
@@ -204,15 +209,36 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sCocos2dSound.end();
 	}
 
+	public static void startCameraPreview() {
+		Cocos2dxHelper.sCocos2dxCamera.startCameraPreview();
+	}
+
+	public static void stopCameraPreview() {
+		Cocos2dxHelper.sCocos2dxCamera.stopCameraPreview();
+	}
+
+	public static boolean hasCamera() {
+		return Cocos2dxHelper.sCocos2dxCamera.hasCamera();
+	}
+
 	public static void onResume() {
 		if (Cocos2dxHelper.sAccelerometerEnabled) {
 			Cocos2dxHelper.sCocos2dxAccelerometer.enable();
+		}
+
+		if (Cocos2dxHelper.sCameraWasPaused == true) {
+			Cocos2dxHelper.sCocos2dxCamera.startCameraPreview();
 		}
 	}
 
 	public static void onPause() {
 		if (Cocos2dxHelper.sAccelerometerEnabled) {
 			Cocos2dxHelper.sCocos2dxAccelerometer.disable();
+		}
+
+		if (Cocos2dxHelper.sCocos2dxCamera.isRunning()) {
+			Cocos2dxHelper.sCocos2dxCamera.stopCameraPreview();
+			sCameraWasPaused = true;
 		}
 	}
 
@@ -244,7 +270,8 @@ public class Cocos2dxHelper {
 	}
 
 	private static String getAbsolutePathOnExternalStorage(final ApplicationInfo pApplicationInfo, final String pPath) {
-		return Environment.getExternalStorageDirectory() + "/Android/data/" + pApplicationInfo.packageName + "/files/" + pPath;
+		return Environment.getExternalStorageDirectory() + "/Android/data/"
+				+ pApplicationInfo.packageName + "/files/" + pPath;
 	}
 
 	// ===========================================================
@@ -253,6 +280,7 @@ public class Cocos2dxHelper {
 
 	public static interface Cocos2dxHelperListener {
 		public void showDialog(final String pTitle, final String pMessage);
+
 		public void showEditTextDialog(final String pTitle, final String pMessage, final int pInputMode, final int pInputFlag, final int pReturnType, final int pMaxLength);
 
 		public void runOnGLThread(final Runnable pRunnable);
