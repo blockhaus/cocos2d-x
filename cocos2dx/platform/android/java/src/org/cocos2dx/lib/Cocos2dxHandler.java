@@ -30,6 +30,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 public class Cocos2dxHandler extends Handler {
 	// ===========================================================
@@ -37,6 +38,7 @@ public class Cocos2dxHandler extends Handler {
 	// ===========================================================
 	public final static int HANDLER_SHOW_DIALOG = 1;
 	public final static int HANDLER_SHOW_EDITBOX_DIALOG = 2;
+	public final static int HANDLER_SHOW_OPTIONDIALOG = 3;
 	
 	// ===========================================================
 	// Fields
@@ -70,7 +72,50 @@ public class Cocos2dxHandler extends Handler {
 		case Cocos2dxHandler.HANDLER_SHOW_EDITBOX_DIALOG:
 			showEditBoxDialog(msg);
 			break;
+		case Cocos2dxHandler.HANDLER_SHOW_OPTIONDIALOG:
+			Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
+					+ " cdcdccd");
+
+			showOptionDialog(msg);
+			break;
 		}
+		
+	}
+	
+	private void showOptionDialog(Message msg) {
+		 
+		Cocos2dxActivity theActivity = this.mActivity.get();
+		DialogOptionMessage dialogMessage = (DialogOptionMessage)msg.obj;
+		//Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
+		//		+ dialogMessage.titile + dialogMessage.message + dialogMessage.optionYES + dialogMessage.optionNO);
+		
+		//theActivity.runOnUiThread(new Runnable() {
+		//	@Override
+		//	public void run() {
+			
+		new AlertDialog.Builder(theActivity)
+		.setTitle(dialogMessage.titile)
+		.setMessage(dialogMessage.message)
+		.setPositiveButton(dialogMessage.optionYES, 
+				new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(1, 0);
+					}
+				})
+		.setNegativeButton(dialogMessage.optionNO,
+				new DialogInterface.OnClickListener() {
+			
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(1, 1);
+					}
+				}
+		).create().show();
+			//}});
 	}
 	
 	private void showDialog(Message msg) {
@@ -112,6 +157,21 @@ public class Cocos2dxHandler extends Handler {
 		public DialogMessage(String title, String message) {
 			this.titile = title;
 			this.message = message;
+		}
+	}
+	
+	public static class DialogOptionMessage {
+		
+		public String titile;
+		public String message;
+		public String optionYES;
+		public String optionNO;
+		
+		public DialogOptionMessage(String title, String message, String optionYES, String optionNO) {
+			this.titile = title;
+			this.message = message;
+			this.optionYES = optionYES;
+			this.optionNO = optionNO;
 		}
 	}
 	

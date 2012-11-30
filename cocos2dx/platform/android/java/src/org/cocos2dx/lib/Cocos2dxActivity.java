@@ -93,6 +93,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	}
 
 	@Override
+	public void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO) { 
+		Message msg = new Message();
+		msg.what = Cocos2dxHandler.HANDLER_SHOW_OPTIONDIALOG;
+		msg.obj = new Cocos2dxHandler.DialogOptionMessage(pTitle, pMessage, optionYES, optionNO);
+		this.mHandler.sendMessage(msg);
+	}
+	
+	@Override
 	public void showEditTextDialog(final String pTitle, final String pContent, final int pInputMode, final int pInputFlag, final int pReturnType, final int pMaxLength) { 
 		Message msg = new Message();
 		msg.what = Cocos2dxHandler.HANDLER_SHOW_EDITBOX_DIALOG;

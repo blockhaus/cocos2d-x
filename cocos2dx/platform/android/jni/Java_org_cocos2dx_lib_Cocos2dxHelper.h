@@ -38,9 +38,12 @@ extern "C" {
     extern void enableAccelerometerJNI();
     extern void disableAccelerometerJNI();
     extern bool hasCameraJNI();
+    extern float getScreenDensityJNI();
     extern void startCameraPreviewJNI();
     extern void stopCameraPreviewJNI();
     extern void setAccelerometerIntervalJNI(float interval);
+    extern void showOptionDialogJNI(const char * pszMsg, const char * pszTitle, const char * optionYES, const char * optionNO);
+    extern void writeToSavedPhotosAlbumJNI(const char * path);
 }
 
 #endif

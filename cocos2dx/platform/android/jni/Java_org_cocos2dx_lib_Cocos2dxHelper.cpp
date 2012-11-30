@@ -193,9 +193,82 @@ extern "C" {
 			t.env->DeleteLocalRef(t.classID);
 		}
 
-    	return hasCamera;
+    	return false;//hasCamera;
+    }
+    
+    float getScreenDensityJNI() {
+    	JniMethodInfo t;
+    	float screenDensity = 1.0;
+        //CCLog("screenDensity:%f",screenDensity);
+    	if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "getScreenDensity", "()F")) {
+			jfloat sd = t.env->CallStaticFloatMethod(t.classID, t.methodID);
+            //CCLog("screenDensity:%f",screenDensity);
+            screenDensity = (float)sd;
+            //CCLog("screenDensity:%f",screenDensity);
+			t.env->DeleteLocalRef(t.classID);
+		}
+        
+    	return screenDensity;
     }
 
+    void Java_org_cocos2dx_lib_Cocos2dxHelper_nativeAlertViewClickedButtonWithTagAtIndex(JNIEnv*  env, jobject thiz, jint externalTag, jint buttonIndex) {
+        int tag = (int)externalTag;
+        int index = (int)buttonIndex;
+        
+    }
+    
+    void showOptionDialogJNI(const char * pszTitle, const char * pszMsg, const char * optionYES, const char * optionNO) {
+        
+        JniMethodInfo t;
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "showOptionDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
+            
+            jstring stringArg1;
+            jstring stringArg2;
+            
+            if (!pszTitle) {
+                stringArg1 = t.env->NewStringUTF("xxxx");
+            } else {
+                stringArg1 = t.env->NewStringUTF(pszTitle);
+            }
+
+            if (!pszMsg) {
+                stringArg2 = t.env->NewStringUTF("xxxxx");
+            } else {
+                stringArg2 = t.env->NewStringUTF(pszMsg);
+            }
+
+            jstring stringOptionYES = t.env->NewStringUTF(optionYES);
+            jstring stringOptionNO = t.env->NewStringUTF(optionNO);
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, stringArg1, stringArg2, stringOptionYES, stringOptionNO);
+            
+            t.env->DeleteLocalRef(stringArg1);
+            t.env->DeleteLocalRef(stringArg2);
+            t.env->DeleteLocalRef(stringOptionYES);
+            t.env->DeleteLocalRef(stringOptionNO);
+            t.env->DeleteLocalRef(t.classID);
+        }
+    }
+    
+    void writeToSavedPhotosAlbumJNI(const char * pszPath) {
+        
+        if (!pszPath) {
+            return;
+        }
+        
+        JniMethodInfo t;
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "writeToSavedPhotosAlbum", "(Ljava/lang/String;)V")) {
+            
+            jstring path = t.env->NewStringUTF(pszPath);
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, path);
+            
+            t.env->DeleteLocalRef(path);
+            t.env->DeleteLocalRef(t.classID);
+        }
+        
+    }
+    
     void setAccelerometerIntervalJNI(float interval) {
     
     }
