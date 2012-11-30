@@ -82,9 +82,13 @@ Java_org_cocos2dx_lib_Cocos2dxCamera_onUpdateCameraFrame(JNIEnv* env,
 	//CCLog("Converting preview data to native RGB fomat");
 
 	if (cameraFormat == CAMERA_PREVIEW_FORMAT_NV21) {
+
+
+        int linePixel = 0;
 		for (j = 0; j < h; j++) {
 			pixPtr = j * w;
 			jDiv2 = j >> 1;
+            linePixel = (j * 1024)-1;
 			for (i = 0; i < w; i++) {
 				Y = yuv[pixPtr];
 				if (Y < 0)
@@ -119,7 +123,7 @@ Java_org_cocos2dx_lib_Cocos2dxCamera_onUpdateCameraFrame(JNIEnv* env,
 				else if (B > 255)
 					B = 255;
 
-				rgbData[j * 1024 + i] = 0xff000000 + (R << 16) + (G << 8) + (B);
+				rgbData[linePixel++] = 0xff000000 + (R << 16) + (G << 8) + (B);
 				pixPtr++;
 			}
 		}

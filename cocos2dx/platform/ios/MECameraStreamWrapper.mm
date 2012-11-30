@@ -65,8 +65,7 @@ static MECameraStreamDisptacher* s_pMECameraStreamDisptacher;
 
 
 -(BOOL) hasCamera {
-    return false;
-    //[[MECameraStream_objec sharedCameraStream] hasCamera];
+    return [[MECameraStream_objec sharedCameraStream] hasCamera];
 }
 
 -(void) takePicture {

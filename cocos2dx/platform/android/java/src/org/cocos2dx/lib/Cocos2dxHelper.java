@@ -31,6 +31,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
+import android.util.Log;
 import android.view.SurfaceView;
 
 public class Cocos2dxHelper {
@@ -53,7 +54,11 @@ public class Cocos2dxHelper {
 
 	private static Cocos2dxCamera sCocos2dxCamera;
 	private static boolean sCameraWasPaused;
-
+	
+	private static float sScreenPhysicalWidth;
+	private static float sScreenPhysicalHeight;
+	private static float sScreenDensity;
+	
 	// ===========================================================
 	// Constructors
 	// ===========================================================
@@ -75,6 +80,9 @@ public class Cocos2dxHelper {
 
 		Cocos2dxHelper.sCocos2dxCamera = new Cocos2dxCamera(pContext);
 		sCameraWasPaused = false;
+		
+		sScreenDensity = pContext.getResources().getDisplayMetrics().density;
+		
 	}
 
 	// ===========================================================
@@ -94,7 +102,9 @@ public class Cocos2dxHelper {
 	private static native void nativeSetExternalAssetPath(final String pExternalAssetPath);
 
 	private static native void nativeSetEditTextDialogResult(final byte[] pBytes);
-
+	
+	private static native void nativeAlertViewClickedButtonWithTagAtIndex(final int tag, final int buttonIndex);
+	
 	public static String getCocos2dxPackageName() {
 		return Cocos2dxHelper.sPackageName;
 	}
@@ -226,6 +236,10 @@ public class Cocos2dxHelper {
 	public static void takePicture(String path) {
 		Cocos2dxHelper.sCocos2dxCamera.takePicture(path);
 	}
+
+	public static float getScreenDensity() {
+		return sScreenDensity;
+	}
 	
 	public static void setCameraPreviewSurface(SurfaceView sv) {
 		Cocos2dxHelper.sCocos2dxCamera.setPreviewSurface(sv);
@@ -259,6 +273,13 @@ public class Cocos2dxHelper {
 	private static void showDialog(final String pTitle, final String pMessage) {
 		Cocos2dxHelper.sCocos2dxHelperListener.showDialog(pTitle, pMessage);
 	}
+	
+	private static void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO) {
+		Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
+				+ " message:" + pMessage);
+
+		Cocos2dxHelper.sCocos2dxHelperListener.showOptionDialog(pTitle, pMessage, optionYES, optionNO);
+	}
 
 	private static void showEditTextDialog(final String pTitle, final String pMessage, final int pInputMode, final int pInputFlag, final int pReturnType, final int pMaxLength) {
 		Cocos2dxHelper.sCocos2dxHelperListener.showEditTextDialog(pTitle, pMessage, pInputMode, pInputFlag, pReturnType, pMaxLength);
@@ -284,15 +305,27 @@ public class Cocos2dxHelper {
 				+ pApplicationInfo.packageName + "/files/" + pPath;
 	}
 
+	
+	public static void setAlertViewClickedButtonWithTagAtIndex(final int tag, final int buttonIndex) {
+		Cocos2dxHelper.nativeAlertViewClickedButtonWithTagAtIndex(tag,buttonIndex);
+	}
+	
+	public static void writeToSavedPhotosAlbum(final String path) {
+		
+	}
+	
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================
 
 	public static interface Cocos2dxHelperListener {
 		public void showDialog(final String pTitle, final String pMessage);
+		
+		public void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO);
 
 		public void showEditTextDialog(final String pTitle, final String pMessage, final int pInputMode, final int pInputFlag, final int pReturnType, final int pMaxLength);
 
 		public void runOnGLThread(final Runnable pRunnable);
+
 	}
 }
