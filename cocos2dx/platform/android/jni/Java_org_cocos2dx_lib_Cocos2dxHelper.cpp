@@ -6,6 +6,7 @@
 #include "cocoa/CCString.h"
 #include "Java_org_cocos2dx_lib_Cocos2dxHelper.h"
 #include "cocos2d.h"
+#include "../../../../../Alcar-Confi-x/Classes/platform/android/MEAlertView.h"
 
 #define  LOG_TAG    "Java_org_cocos2dx_lib_Cocos2dxHelper.cpp"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -195,7 +196,7 @@ extern "C" {
 			t.env->DeleteLocalRef(t.classID);
 		}
 
-    	return false;//hasCamera;
+    	return hasCamera;
     }
     
     float getScreenDensityJNI() {
@@ -216,7 +217,7 @@ extern "C" {
     void Java_org_cocos2dx_lib_Cocos2dxHelper_nativeAlertViewClickedButtonWithTagAtIndex(JNIEnv*  env, jobject thiz, jint externalTag, jint buttonIndex) {
         int tag = (int)externalTag;
         int index = (int)buttonIndex;
-        
+        MEAlertView::sharedView()->alertViewClickedButtonWithTagAtIndex(tag, index);
     }
     
     void showOptionDialogJNI(const char * pszTitle, const char * pszMsg, const char * optionYES, const char * optionNO) {
@@ -268,23 +269,19 @@ extern "C" {
         	}
         }
 
-    void writeToSavedPhotosAlbumJNI(const char * pszPath) {
-        
-        if (!pszPath) {
-            return;
-        }
-        
+    const char* getExternalStoragePictureFolderJNI() {
+        const char* pathString = NULL;
+
         JniMethodInfo t;
-        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "writeToSavedPhotosAlbum", "(Ljava/lang/String;)V")) {
-            
-            jstring path = t.env->NewStringUTF(pszPath);
-            
-            t.env->CallStaticVoidMethod(t.classID, t.methodID, path);
-            
-            t.env->DeleteLocalRef(path);
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "getExternalStoragePictureFolder", "()Ljava/lang/String;")) {
+            jstring externalPicturePath = (jstring) t.env->CallStaticObjectMethod(t.classID, t.methodID);
+            pathString = JniHelper::jstring2string(externalPicturePath).c_str();
+
+            t.env->DeleteLocalRef(externalPicturePath);
             t.env->DeleteLocalRef(t.classID);
         }
         
+       return pathString;
     }
     
     void setAccelerometerIntervalJNI(float interval) {

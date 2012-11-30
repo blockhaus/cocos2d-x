@@ -310,9 +310,11 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.nativeAlertViewClickedButtonWithTagAtIndex(tag,buttonIndex);
 	}
 	
-	public static void writeToSavedPhotosAlbum(final String path) {
-		
+	public static String getExternalStoragePictureFolder() {
+		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 	}
+	
+	
 	
 	// ===========================================================
 	// Inner and Anonymous Classes

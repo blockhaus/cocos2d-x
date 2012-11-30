@@ -44,7 +44,7 @@ extern "C" {
 	extern void takePictureJNI(const char* path);
     extern void setAccelerometerIntervalJNI(float interval);
     extern void showOptionDialogJNI(const char * pszMsg, const char * pszTitle, const char * optionYES, const char * optionNO);
-    extern void writeToSavedPhotosAlbumJNI(const char * path);
+    extern const char* getExternalStoragePictureFolderJNI();
 }
 
 #endif
