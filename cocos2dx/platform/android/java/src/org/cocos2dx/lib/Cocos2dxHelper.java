@@ -32,6 +32,7 @@ import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 public class Cocos2dxHelper {
 	// ===========================================================
@@ -231,8 +232,14 @@ public class Cocos2dxHelper {
 		return Cocos2dxHelper.sCocos2dxCamera.hasCamera();
 	}
 	
+
 	public static float getScreenDensity() {
-		return 50.0f;
+		return sScreenDensity;
+	}
+	
+	public static void setCameraPreviewSurface(SurfaceHolder sv) {
+		Cocos2dxHelper.sCocos2dxCamera.setPreviewSurface(sv);
+
 	}
 
 	public static void onResume() {

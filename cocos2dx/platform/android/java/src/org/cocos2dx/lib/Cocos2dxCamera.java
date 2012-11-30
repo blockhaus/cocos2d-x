@@ -28,20 +28,17 @@ import java.io.IOException;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Size;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
 
-// @SuppressWarnings("unused")
-public class Cocos2dxCamera {
-	// ===========================================================
+public class Cocos2dxCamera implements SurfaceHolder.Callback {
+	// =============================================================================
 	// Constants
-	// ===========================================================
+	// =============================================================================
 
 	private static final String TAG = Cocos2dxCamera.class.getSimpleName();
 
@@ -75,9 +72,9 @@ public class Cocos2dxCamera {
 	 */
 	private static final int PREVIEW_FORMAT_UNSUPPORTED = -1;
 
-	// ===========================================================
+	// =============================================================================
 	// Fields
-	// ===========================================================
+	// =============================================================================
 
 	/**
 	 * Camera device once opened.
@@ -89,8 +86,14 @@ public class Cocos2dxCamera {
 	 */
 	private int mCameraId;
 
+	/**
+	 * Camera preview width
+	 */
 	private int mCameraWidth, mCameraHeight;
 
+	/**
+	 * Camera preview height
+	 */
 	private int mPreviewFormat;
 
 	/**
@@ -98,16 +101,19 @@ public class Cocos2dxCamera {
 	 */
 	private int mUsedPreviewFormat;
 
-	private SurfaceView mDummyView;
+	/**
+	 * Surface view for preview (should be hidden). This is needed by some
+	 * devices.
+	 */
+	private SurfaceHolder mHolder;
 
-	// ===========================================================
-	// Constructors
-	// ===========================================================
+	// =============================================================================
+	// Constructor
+	// =============================================================================
 
 	public Cocos2dxCamera(Context pContext) {
 		this.mCamera = null;
 		this.mUsedPreviewFormat = PREVIEW_FORMAT_UNSUPPORTED;
-		this.mDummyView = this.createDummySurfaceView(pContext);
 		this.mCameraId = this.setupCamera(pContext);
 	}
 
@@ -115,14 +121,64 @@ public class Cocos2dxCamera {
 	// Public Methods
 	// =============================================================================
 
+	/**
+	 * Tells wheter a camera preview is currently running or not. This is used
+	 * by the helper to restart the camera after the app was paused.
+	 * 
+	 * @return
+	 */
 	public boolean isRunning() {
 		return this.mCamera != null;
 	}
 
+	/**
+	 * Tells the app wheter the device has a "suitable" camera or not. Only
+	 * cameras that are facing backwards and have a supported preview mode are
+	 * counted.
+	 * 
+	 * @return
+	 */
 	public boolean hasCamera() {
 		return this.mCameraId != INVALID_CAMERA_ID;
 	}
 
+	/**
+	 * Allows the activity to set a dummy preview surface needed to start
+	 * preview mode on certain device.
+	 * 
+	 * @param sv
+	 */
+	public void setPreviewSurface(SurfaceHolder holder) {
+		Log.v(TAG, "Got Previewsurface");
+		this.mHolder = holder;
+		this.mHolder.addCallback(this);
+	}
+
+	/**
+	 * Stops camera preview and releases the camera device.
+	 */
+	public void stopCameraPreview() {
+		if (this.mCamera != null) {
+			try {
+				this.mCamera.stopPreview();
+				this.mCamera.setPreviewDisplay(null);
+				this.mCamera.setPreviewCallbackWithBuffer(null);
+				this.mCamera.release();
+				this.mCamera = null;
+				this.freeNativeResources();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void finish() {
+		stopCameraPreview();
+	};
+
+	/**
+	 * Starts camera preview.
+	 */
 	public void startCameraPreview() {
 		// Try to open camera
 		try {
@@ -134,14 +190,19 @@ public class Cocos2dxCamera {
 
 		if (mCamera != null) {
 			try {
+				// Provide surface holder
+				try {
+					this.mCamera.setPreviewDisplay(this.mHolder);
+				} catch (Exception e) {
+					Log.d(TAG, "Could not add preview surface.");
+					;
+				}
+
 				// Setup camera with pre-configured parameters
 				Camera.Parameters params = this.mCamera.getParameters();
-
 				params.setPreviewFormat(this.mPreviewFormat);
 				params.setPreviewSize(this.mCameraWidth, this.mCameraHeight);
 				this.mCamera.setParameters(params);
-
-				this.mCamera.setPreviewDisplay(this.mDummyView.getHolder());
 
 				final int dataBufferSize = (int) (this.mCameraWidth
 						* this.mCameraHeight * (ImageFormat.getBitsPerPixel(this.mPreviewFormat) / 8.0));
@@ -172,6 +233,10 @@ public class Cocos2dxCamera {
 			}
 		}
 	}
+
+	// =============================================================================
+	// Methods
+	// =============================================================================
 
 	private int setupCamera(Context pContext) {
 		int cameraId = INVALID_CAMERA_ID;
@@ -212,12 +277,13 @@ public class Cocos2dxCamera {
 						this.mUsedPreviewFormat = PREVIEW_FORMAT_NV21;
 						this.mPreviewFormat = previewFormat;
 						break previewFormatLoop;
-					} else if (previewFormat == ImageFormat.YV12) {
-						// Choose supported preview format YV12
-						this.mUsedPreviewFormat = PREVIEW_FORMAT_YV12;
-						this.mPreviewFormat = previewFormat;
-						break previewFormatLoop;
 					}
+					// else if (previewFormat == ImageFormat.YV12) {
+					// // Choose supported preview format YV12
+					// this.mUsedPreviewFormat = PREVIEW_FORMAT_YV12;
+					// this.mPreviewFormat = previewFormat;
+					// break previewFormatLoop;
+					// }
 				}
 
 				// Skip camera if no supported preview format was found
@@ -270,41 +336,61 @@ public class Cocos2dxCamera {
 		return cameraId;
 	}
 
-	private SurfaceView createDummySurfaceView(Context pContext) {
-		final SurfaceView surfaceView = new SurfaceView(pContext);
+	public Camera.Size getBestPreviewSize(Camera.Parameters parameters, int w, int h) {
+		Camera.Size result = null;
 
-		WindowManager wm = (WindowManager) pContext.getSystemService(Context.WINDOW_SERVICE);
-		LayoutParams params = new WindowManager.LayoutParams(1,1,
-	            WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-	            WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,
-	            PixelFormat.TRANSLUCENT); 
-		
-		wm.addView(surfaceView, params);
+		for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
+			if (size.width <= w && size.height <= h) {
+				if (null == result)
+					result = size;
+				else {
+					int resultDelta = w - result.width + h - result.height;
+					int newDelta = w - size.width + h - size.height;
 
-		surfaceView.setZOrderOnTop(true);
-		surfaceView.getHolder().setFormat(PixelFormat.TRANSPARENT);
-		
-		return surfaceView;
-	}
-
-	public void stopCameraPreview() {
-		if (this.mCamera != null) {
-			try {
-				this.mCamera.stopPreview();
-				this.mCamera.setPreviewDisplay(null);
-				this.mCamera.setPreviewCallbackWithBuffer(null);
-				this.mCamera.release();
-				this.mCamera = null;
-				this.freeNativeResources();
-			} catch (IOException e) {
-				e.printStackTrace();
+					if (newDelta < resultDelta)
+						result = size;
+				}
 			}
 		}
+		return result;
 	}
 
-	public void finish() {
-		stopCameraPreview();
-	};
+	// =============================================================================
+	// Interface implementations
+	// =============================================================================
+
+	// Required camera surface holder interface Callback's
+	public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
+		Camera.Parameters params = mCamera.getParameters();
+		Camera.Size size = getBestPreviewSize(params, w, h);
+
+		if (size != null)
+			params.setPreviewSize(size.width, size.height);
+		
+		mCamera.startPreview();
+	}
+
+	// When the surface is ready then we can build the camera and attach
+	// the camera preview output to the UI holder
+	public void surfaceCreated(SurfaceHolder holder) {
+		try {
+
+			mCamera = Camera.open();
+			mCamera.setPreviewDisplay(mHolder);
+
+		} catch (IOException e) {
+		}
+
+	}
+
+	// Stop the camera preview and dispose of the camera object
+	public void surfaceDestroyed(SurfaceHolder holder) {
+		if (null == mCamera)
+			return;
+		mCamera.stopPreview();
+		mCamera.release();
+		mCamera = null;
+	}
 
 	// =============================================================================
 	// JNI Methods
