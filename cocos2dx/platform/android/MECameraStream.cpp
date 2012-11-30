@@ -23,8 +23,10 @@ THE SOFTWARE.
 ****************************************************************************/
 #include "MECameraStream.h"
 #include "jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
+#include "jni/Java_org_cocos2dx_lib_Cocos2dxCamera.h"
 #include <stdio.h>
 #include <android/log.h>
+#include "platform/CCFileUtils.h"
 
 #define  LOG_TAG    "MECameraStream_android"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -43,7 +45,9 @@ namespace cocos2d
     
     static void static_takePicture()
     {
-      
+    	std::string path = CCFileUtils::sharedFileUtils()->getWriteablePath() + "camera_image.jpg";
+
+      takePictureJNI(path.c_str());
     }
     
     static void static_startPreview()
@@ -99,9 +103,6 @@ namespace cocos2d
     bool MECameraStream::hasCamera()
     {
     	bool hasCamera = static_hasCamera();
-
-    	CCLog("has Camera = %d", hasCamera);
-
         return hasCamera;
     }
     
@@ -112,19 +113,16 @@ namespace cocos2d
     
     void MECameraStream::startPreview()
     {
-    	CCLog("Start");
         static_startPreview();
     }
     
     void MECameraStream::stopPreview()
     {
-    	CCLog("Stop");
         static_stopPreview();
     }
 
     void MECameraStream::setDelegate(MECameraStreamDelegate* pDelegate)
     {
-    	CCLog("setDelegate");
     	m_pCameraStreamDelegate = pDelegate;
     }
 
@@ -133,10 +131,16 @@ namespace cocos2d
         if (m_pCameraStreamDelegate) {
         	unsigned long w = width;
         	unsigned long h = height;
-        	//CCLog("MECameraStream: %s", rgb);
 
             m_pCameraStreamDelegate->updateTextureWithSampleBuffer((unsigned char*)rgb, w, h);
         }
+    }
+
+    void MECameraStream::onPictureTaken(const char* filePath) {
+    	if(m_pCameraStreamDelegate) {
+    		CCLog("MECameraStream::onPictureTaken(%s)", filePath);
+    		m_pCameraStreamDelegate->didTakePicture(filePath);
+    	}
     }
 
 }

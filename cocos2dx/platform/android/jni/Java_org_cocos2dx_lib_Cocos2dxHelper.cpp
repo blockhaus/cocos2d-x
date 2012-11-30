@@ -5,7 +5,7 @@
 #include "JniHelper.h"
 #include "cocoa/CCString.h"
 #include "Java_org_cocos2dx_lib_Cocos2dxHelper.h"
-
+#include "cocos2d.h"
 
 #define  LOG_TAG    "Java_org_cocos2dx_lib_Cocos2dxHelper.cpp"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -177,6 +177,8 @@ extern "C" {
     void stopCameraPreviewJNI() {
         JniMethodInfo t;
         
+        CCLog("stopCameraPreviewJNI()");
+
         if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "stopCameraPreview", "()V")) {
             t.env->CallStaticVoidMethod(t.classID, t.methodID);
             t.env->DeleteLocalRef(t.classID);
@@ -194,6 +196,20 @@ extern "C" {
 		}
 
     	return hasCamera;
+    }
+
+    void takePictureJNI(const char* path) {
+    	JniMethodInfo t;
+
+    	if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "takePicture",
+    			"(Ljava/lang/String;)V")) {
+
+    		jstring jpath = t.env->NewStringUTF(path);
+
+    		t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
+    		t.env->DeleteLocalRef(t.classID);
+    		t.env->DeleteLocalRef(jpath);
+    	}
     }
 
     void setAccelerometerIntervalJNI(float interval) {

@@ -50,7 +50,7 @@ namespace   cocos2d {
         
         void setDelegate(MECameraStreamDelegate* pDelegate);
         void update(int* rgb, int width, int height);
-        
+        void onPictureTaken(const char* filePath);
     private:
         MECameraStreamDelegate* m_pCameraStreamDelegate;
         //MECameraData m_obCameraData;

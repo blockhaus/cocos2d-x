@@ -40,6 +40,7 @@ extern "C" {
     extern bool hasCameraJNI();
     extern void startCameraPreviewJNI();
     extern void stopCameraPreviewJNI();
+	extern void takePictureJNI(const char* path);
     extern void setAccelerometerIntervalJNI(float interval);
 }
 
