@@ -275,9 +275,6 @@ public class Cocos2dxHelper {
 	}
 	
 	private static void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO) {
-		Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
-				+ " message:" + pMessage);
-
 		Cocos2dxHelper.sCocos2dxHelperListener.showOptionDialog(pTitle, pMessage, optionYES, optionNO);
 	}
 
@@ -314,8 +311,18 @@ public class Cocos2dxHelper {
 		return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 	}
 	
+	public static void exitWheelsConfigurator() {
+		
+	}
 	
+	public static void postImageToFacebook(final String pPath) {
+		Log.i("Cocos2dxHelper", "pPath: " + pPath);
+	}
 	
+	public static void sendPerEmail(final String pPath) {
+		Log.i("Cocos2dxHelper", "pPath: " + pPath);
+	}
+
 	// ===========================================================
 	// Inner and Anonymous Classes
 	// ===========================================================

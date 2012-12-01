@@ -45,6 +45,9 @@ extern "C" {
     extern void setAccelerometerIntervalJNI(float interval);
     extern void showOptionDialogJNI(const char * pszMsg, const char * pszTitle, const char * optionYES, const char * optionNO);
     extern const char* getExternalStoragePictureFolderJNI();
+    extern void exitWheelsConfiguratorJNI();
+    extern void postOnFacebookJNI(const char* path);
+    extern void sendPerEmailJNI(const char* path);
 }
 
 #endif

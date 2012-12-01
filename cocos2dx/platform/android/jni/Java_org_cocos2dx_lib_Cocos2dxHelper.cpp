@@ -255,19 +255,19 @@ extern "C" {
         }
     }
     
-        void takePictureJNI(const char* path) {
-        	JniMethodInfo t;
-
-        	if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "takePicture",
-        			"(Ljava/lang/String;)V")) {
-
-        		jstring jpath = t.env->NewStringUTF(path);
-
-        		t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
-        		t.env->DeleteLocalRef(t.classID);
-        		t.env->DeleteLocalRef(jpath);
-        	}
+    void takePictureJNI(const char* path) {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "takePicture",
+                                           "(Ljava/lang/String;)V")) {
+            
+            jstring jpath = t.env->NewStringUTF(path);
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
+            t.env->DeleteLocalRef(t.classID);
+            t.env->DeleteLocalRef(jpath);
         }
+    }
 
     const char* getExternalStoragePictureFolderJNI() {
         const char* pathString = NULL;
@@ -285,6 +285,48 @@ extern "C" {
     }
     
     void setAccelerometerIntervalJNI(float interval) {
-    
+        
     }
+    
+    void exitWheelsConfiguratorJNI() {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "exitWheelsConfigurator",
+                                           "()V")) {
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID);
+            t.env->DeleteLocalRef(t.classID);
+        
+        }
+    }
+
+    void postOnFacebookJNI(const char* path) {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "postImageToFacebook",
+                                           "(Ljava/lang/String;)V")) {
+            
+            jstring jpath = t.env->NewStringUTF(path);
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
+            t.env->DeleteLocalRef(t.classID);
+            t.env->DeleteLocalRef(jpath);
+        }
+    }
+    
+    void sendPerEmailJNI(const char* path) {
+        JniMethodInfo t;
+        
+        if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "sendPerEmail",
+                                           "(Ljava/lang/String;)V")) {
+            
+            jstring jpath = t.env->NewStringUTF(path);
+            
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
+            t.env->DeleteLocalRef(t.classID);
+            t.env->DeleteLocalRef(jpath);
+        }
+
+    }
+    
 }
