@@ -300,15 +300,18 @@ extern "C" {
         }
     }
 
-    void postOnFacebookJNI(const char* path) {
+    void postOnFacebookJNI(const char* shareText, const char* path, const char* optionYES, const char* optionNO) {
         JniMethodInfo t;
         
         if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "postImageToFacebook",
-                                           "(Ljava/lang/String;)V")) {
+                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
             
+            jstring jshareText = t.env->NewStringUTF(shareText);
             jstring jpath = t.env->NewStringUTF(path);
+            jstring joptionYES = t.env->NewStringUTF(optionYES);
+            jstring joptionNO = t.env->NewStringUTF(optionNO);
             
-            t.env->CallStaticVoidMethod(t.classID, t.methodID, jpath);
+            t.env->CallStaticVoidMethod(t.classID, t.methodID, jshareText, jpath, joptionYES, joptionNO);
             t.env->DeleteLocalRef(t.classID);
             t.env->DeleteLocalRef(jpath);
         }

@@ -26,11 +26,14 @@ package org.cocos2dx.lib;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
+import org.cocos2dx.lib.Cocos2dxHandler.ShareMessage;
+
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceView;
 
@@ -274,6 +277,10 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sCocos2dxHelperListener.showDialog(pTitle, pMessage);
 	}
 	
+	private static void showShareDialog(final int pTag, final String pTitle, final String pImagePath, final String optionYES, final String optionNO) {
+		Cocos2dxHelper.sCocos2dxHelperListener.showShareDialog(pTag, pTitle, pImagePath, optionYES, optionNO);
+	}
+	
 	private static void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO) {
 		Cocos2dxHelper.sCocos2dxHelperListener.showOptionDialog(pTitle, pMessage, optionYES, optionNO);
 	}
@@ -304,7 +311,19 @@ public class Cocos2dxHelper {
 
 	
 	public static void setAlertViewClickedButtonWithTagAtIndex(final int tag, final int buttonIndex) {
+		
 		Cocos2dxHelper.nativeAlertViewClickedButtonWithTagAtIndex(tag,buttonIndex);
+	}
+	
+	public static void setAlertViewClickedButtonWithTagAtIndex(final int tag, final int buttonIndex,final String imagePath, final String shareText) {
+		
+		//facebook share
+		if (tag==2) {
+			//final ShareMessage dialogMessage = (ShareMessage)msg.obj;
+			Log.i("Cocos2dxHelper", "dialogMessage: "+imagePath + "text: "+shareText);
+		}
+		
+		Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(tag, buttonIndex);
 	}
 	
 	public static String getExternalStoragePictureFolder() {
@@ -315,8 +334,9 @@ public class Cocos2dxHelper {
 		
 	}
 	
-	public static void postImageToFacebook(final String pPath) {
+	public static void postImageToFacebook(final String pShareText,final String pPath,final String pOptionYES,final String pOptionNO) {
 		Log.i("Cocos2dxHelper", "pPath: " + pPath);
+		Cocos2dxHelper.sCocos2dxHelperListener.showShareDialog(2, pShareText, pPath, pOptionYES, pOptionNO);
 	}
 	
 	public static void sendPerEmail(final String pPath) {
@@ -329,6 +349,8 @@ public class Cocos2dxHelper {
 
 	public static interface Cocos2dxHelperListener {
 		public void showDialog(final String pTitle, final String pMessage);
+		
+		public void showShareDialog(final int pTag, final String pTitle, final String pImagePath, final String optionYES, final String optionNO);
 		
 		public void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO);
 

@@ -24,13 +24,20 @@ THE SOFTWARE.
 
 package org.cocos2dx.lib;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
 
 public class Cocos2dxHandler extends Handler {
 	// ===========================================================
@@ -39,6 +46,7 @@ public class Cocos2dxHandler extends Handler {
 	public final static int HANDLER_SHOW_DIALOG = 1;
 	public final static int HANDLER_SHOW_EDITBOX_DIALOG = 2;
 	public final static int HANDLER_SHOW_OPTIONDIALOG = 3;
+	public final static int HANDLER_SHOW_SHAREDIALOG = 4;
 	
 	// ===========================================================
 	// Fields
@@ -73,26 +81,20 @@ public class Cocos2dxHandler extends Handler {
 			showEditBoxDialog(msg);
 			break;
 		case Cocos2dxHandler.HANDLER_SHOW_OPTIONDIALOG:
-			Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
-					+ " cdcdccd");
-
 			showOptionDialog(msg);
+			break;
+		case Cocos2dxHandler.HANDLER_SHOW_SHAREDIALOG:
+			showShareDialog(msg);
 			break;
 		}
 		
 	}
 	
 	private void showOptionDialog(Message msg) {
-		 
+		
 		Cocos2dxActivity theActivity = this.mActivity.get();
 		DialogOptionMessage dialogMessage = (DialogOptionMessage)msg.obj;
-		//Log.i("Cocos2dxHelper", Cocos2dxCamera.class.toString()
-		//		+ dialogMessage.titile + dialogMessage.message + dialogMessage.optionYES + dialogMessage.optionNO);
-		
-		//theActivity.runOnUiThread(new Runnable() {
-		//	@Override
-		//	public void run() {
-			
+
 		new AlertDialog.Builder(theActivity)
 		.setTitle(dialogMessage.titile)
 		.setMessage(dialogMessage.message)
@@ -115,7 +117,7 @@ public class Cocos2dxHandler extends Handler {
 					}
 				}
 		).create().show();
-			//}});
+		
 	}
 	
 	private void showDialog(Message msg) {
@@ -144,6 +146,58 @@ public class Cocos2dxHandler extends Handler {
 				editBoxMessage.inputFlag,
 				editBoxMessage.returnType,
 				editBoxMessage.maxLength).show();
+	}
+	
+	private void showShareDialog(final Message msg) {
+		
+		//final Message newMsg = msg;
+		Cocos2dxActivity theActivity = this.mActivity.get();
+		final ShareMessage dialogMessage = (ShareMessage)msg.obj;
+		final EditText input = new EditText(theActivity);
+		input.setInputType(EditorInfo.TYPE_NULL);
+		
+		File imgFile = new  File(dialogMessage.imagePath);
+		Bitmap shareBitmap = null;
+		if(imgFile.exists()){
+			shareBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+		}
+		BitmapDrawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(shareBitmap, 320, 210, true));
+		/*
+		Rect bounds = new Rect(); 
+		bounds.set(0, 0, 100, 66);
+		icon.setBounds(bounds);
+		*/
+		new AlertDialog.Builder(theActivity)
+		.setTitle(" ")
+		.setIcon(icon)
+		.setView(input)
+		.setPositiveButton(dialogMessage.optionYES, 
+				new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(dialogMessage.tag, 0, dialogMessage.imagePath, input.getText().toString());
+					}
+				})
+		.setNegativeButton(dialogMessage.optionNO,
+				new DialogInterface.OnClickListener() {
+			
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+						Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(dialogMessage.tag, 1);
+					}
+				}
+		).create().show();
+		/*
+		ShareMessage shareMessage = (ShareMessage)msg.obj;
+		new Cocos2dxShareDialog(this.mActivity.get(),
+				shareMessage.title,
+				shareMessage.imagePath
+				).show();
+				
+				*/
 	}
 	
 	// ===========================================================
@@ -192,4 +246,21 @@ public class Cocos2dxHandler extends Handler {
 			this.maxLength = maxLength;
 		}
 	}
+	
+	public static class ShareMessage {
+		public int tag;
+		public String title;
+		public String imagePath;
+		public String optionYES;
+		public String optionNO;
+		
+		public ShareMessage(int tag, String title, String imagePath, String optionYES, String optionNO) {
+			this.tag = tag;
+			this.title = title;
+			this.imagePath = imagePath;
+			this.optionYES = optionYES;
+			this.optionNO = optionNO;
+		}
+	}
+	
 }

@@ -91,6 +91,14 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 		msg.obj = new Cocos2dxHandler.DialogMessage(pTitle, pMessage);
 		this.mHandler.sendMessage(msg);
 	}
+	
+	@Override
+	public void showShareDialog(final int pTag, final String pTitle, final String pImagePath, final String optionYES, final String optionNO) {
+		Message msg = new Message();
+		msg.what = Cocos2dxHandler.HANDLER_SHOW_SHAREDIALOG;
+		msg.obj = new Cocos2dxHandler.ShareMessage(pTag, pTitle, pImagePath, optionYES, optionNO);
+		this.mHandler.sendMessage(msg);
+	}
 
 	@Override
 	public void showOptionDialog(final String pTitle, final String pMessage, final String optionYES, final String optionNO) { 
