@@ -31,8 +31,8 @@ width(w), height(h), area(w*h), quality_(80) {
     height = h;
     area = w * h;
     
-    rgb_data = (unsigned char *) malloc(4 * area);
-    memcpy(rgb_data, rgb, 4 * area);
+    rgb_data = (unsigned char *) malloc(3 * area);
+    memcpy(rgb_data, rgb, 3 * area);
     
     if (alpha == NULL) {
         png_alpha = NULL;
@@ -329,9 +329,10 @@ void Image::Crop(const int x, const int y, const int w, const int h) {
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
             if (j>=y && i>=x && j<y2 && i<x2) {
-                for (int k = 0; k < 4; k++) {
-                    new_rgb[4*ipos + k] = static_cast<unsigned char> (rgb_data[4*opos + k]);
+                for (int k = 0; k < 3; k++) {
+                    new_rgb[4*ipos + k] = static_cast<unsigned char> (rgb_data[3*opos + k]);
                 }
+                new_rgb[4*ipos + 3] = static_cast<unsigned char> (255);
                 if (png_alpha != NULL)
                     new_alpha[ipos] = static_cast<unsigned char> (png_alpha[opos]);
                 ipos++;
