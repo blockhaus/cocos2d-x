@@ -304,7 +304,7 @@ extern "C" {
         JniMethodInfo t;
         
         if (JniHelper::getStaticMethodInfo(t, CLASS_NAME, "postImageToFacebook",
-                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
+                                           "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V")) {
             
             jstring jshareText = t.env->NewStringUTF(shareText);
             jstring jpath = t.env->NewStringUTF(path);

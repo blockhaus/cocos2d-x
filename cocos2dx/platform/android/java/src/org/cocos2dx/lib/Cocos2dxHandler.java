@@ -28,6 +28,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 
 import android.app.AlertDialog;
+import android.app.Service;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,8 +37,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class Cocos2dxHandler extends Handler {
 	// ===========================================================
@@ -154,7 +160,26 @@ public class Cocos2dxHandler extends Handler {
 		Cocos2dxActivity theActivity = this.mActivity.get();
 		final ShareMessage dialogMessage = (ShareMessage)msg.obj;
 		final EditText input = new EditText(theActivity);
-		input.setInputType(EditorInfo.TYPE_NULL);
+		//input.setInputType(EditorInfo.TYPE_NULL);
+		final InputMethodManager imm = (InputMethodManager)theActivity.getSystemService(Service.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(input, 0);
+		
+		input.setOnKeyListener(new View.OnKeyListener() {
+	
+			@Override
+			public boolean onKey(View v, int keyCode, KeyEvent event) {
+				
+				// TODO Auto-generated method stub
+				if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+	                       (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) 
+				{
+					imm.hideSoftInputFromWindow(input.getWindowToken(), 0);
+	            }
+	            
+				// Returning false allows other listeners to react to the press.
+	            return false;
+			}
+		});
 		
 		File imgFile = new  File(dialogMessage.imagePath);
 		Bitmap shareBitmap = null;
@@ -162,11 +187,7 @@ public class Cocos2dxHandler extends Handler {
 			shareBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 		}
 		BitmapDrawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(shareBitmap, 320, 210, true));
-		/*
-		Rect bounds = new Rect(); 
-		bounds.set(0, 0, 100, 66);
-		icon.setBounds(bounds);
-		*/
+
 		new AlertDialog.Builder(theActivity)
 		.setTitle(" ")
 		.setIcon(icon)
