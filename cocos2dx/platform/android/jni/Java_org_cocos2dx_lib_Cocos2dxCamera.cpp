@@ -7,6 +7,7 @@
 #include "MECameraStream.h"
 #include "../../CCImage.h"
 #include "../../CCFileUtils.h"
+#include "../image.h"
 
 using namespace cocos2d;
 
@@ -22,16 +23,44 @@ Java_org_cocos2dx_lib_Cocos2dxCamera_onPictureTaken(JNIEnv* env, jobject thiz, j
 	path.append("camera_image.jpg");
 
 	CCLog("native width %d height %d", width, height);
-
+    
+    int newWidth;
+    int newHeight;
+    float aspectRatio = (float)width/(float)height;
+    int offsetX;
+    int offsetY;
+    if (aspectRatio>1.5) {
+        newWidth = (int)(((float)height)*1.5);
+        newHeight = (int)height;
+    } else {
+        newWidth = (int)width;
+        newHeight = (int)(((float)width)/1.5);
+    }
+    offsetX = (int)((width - newWidth)*0.5);
+    offsetY = (int)((height - newHeight)*0.5);
+    
 	jbyte* data = env->GetByteArrayElements(jdata, 0);
-
+    
+    //jpg stream to RGB
     CCImage *pImage = new CCImage();
-    pImage->initWithImageData(data, dataLen, CCImage::kFmtJpg, width, height);
+    pImage->initWithImageData(data, dataLen, (CCImage::kFmtJpg), width, height);
+    
+    unsigned char *newImageData = (unsigned char *)pImage->getData();
+    int newImageDataLen = pImage->getDataLen()*3;
+    //RGB stream to RGB -> crop to 3/2
+    Image newImage = Image(width,height,newImageData,NULL);
+    newImage.Crop(offsetX, offsetY, newWidth, newHeight);
+    
+    char *newData = (char *)newImage.getRGBData();
+    int newDataLen = newWidth*newHeight*4;
+    //load RGBA
+    CCImage *pImage2 = new CCImage();
+    pImage2->initWithImageData(newData, newDataLen, (CCImage::kFmtRawData), newWidth, newHeight,8);
 
-    //pImage->saveToFile("/sdcard/at.blockhausmedien.alcarconfi/camera_image.jpg", 0);
-    pImage->saveToFile(path.c_str(), 0);
+    pImage2->saveToFile(path.c_str(), 0);
     CC_SAFE_DELETE(pImage);
-
+    CC_SAFE_DELETE(pImage2);
+    
 	MECameraStream::sharedStream()->onPictureTaken(path.c_str());
 }
 
