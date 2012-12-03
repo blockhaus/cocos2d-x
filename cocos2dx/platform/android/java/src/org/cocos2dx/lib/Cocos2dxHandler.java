@@ -32,17 +32,19 @@ import android.app.Service;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Rect;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnKeyListener;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class Cocos2dxHandler extends Handler {
@@ -160,6 +162,7 @@ public class Cocos2dxHandler extends Handler {
 		Cocos2dxActivity theActivity = this.mActivity.get();
 		final ShareMessage dialogMessage = (ShareMessage)msg.obj;
 		final EditText input = new EditText(theActivity);
+		//input.setTy
 		//input.setInputType(EditorInfo.TYPE_NULL);
 		final InputMethodManager imm = (InputMethodManager)theActivity.getSystemService(Service.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(input, 0);
@@ -186,12 +189,30 @@ public class Cocos2dxHandler extends Handler {
 		if(imgFile.exists()){
 			shareBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
 		}
-		BitmapDrawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(shareBitmap, 320, 210, true));
+		BitmapDrawable icon = new BitmapDrawable(Bitmap.createScaledBitmap(shareBitmap, 240, 160, true));
 
-		new AlertDialog.Builder(theActivity)
-		.setTitle(" ")
-		.setIcon(icon)
-		.setView(input)
+		ImageView image = new ImageView(theActivity);
+		//image.setImageBitmap(shareBitmap);
+		image.setImageDrawable(icon);
+		//image.getLayoutParams().width = 210;
+		//image.getLayoutParams().height = 140;
+		TextView title = new TextView(theActivity);
+		// You Can Customise your Title here 
+		title.setText("facebook");
+		title.setBackgroundColor(Color.argb(255, 59, 89, 152));
+		title.setPadding(10, 10, 10, 10);
+		title.setGravity(Gravity.CENTER);
+		title.setTextColor(Color.WHITE);
+		title.setTextSize(20);
+		
+		LinearLayout shareLayout= new LinearLayout(theActivity);
+		shareLayout.setOrientation(1); //1 is for vertical orientation
+		shareLayout.addView(title);
+		shareLayout.addView(image);
+		shareLayout.addView(input);
+		
+		AlertDialog shareAlert = new AlertDialog.Builder(theActivity)
+		.setView(shareLayout)
 		.setPositiveButton(dialogMessage.optionYES, 
 				new DialogInterface.OnClickListener() {
 					
@@ -210,7 +231,15 @@ public class Cocos2dxHandler extends Handler {
 						Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(dialogMessage.tag, 1);
 					}
 				}
-		).create().show();
+		).create();
+		
+		//shareAlert.getLayoutInflater().
+		//ColorDrawable cd = new ColorDrawable(Color.argb(255, 59, 89, 152));
+		
+		//shareAlert.getWindow().setBackgroundDrawableResource(R.drawable.dialog_box);
+		shareAlert.show();
+		
+		
 		/*
 		ShareMessage shareMessage = (ShareMessage)msg.obj;
 		new Cocos2dxShareDialog(this.mActivity.get(),
