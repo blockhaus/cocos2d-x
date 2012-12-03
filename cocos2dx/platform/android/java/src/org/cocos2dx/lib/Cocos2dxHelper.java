@@ -26,14 +26,13 @@ package org.cocos2dx.lib;
 import java.io.UnsupportedEncodingException;
 import java.util.Locale;
 
-import org.cocos2dx.lib.Cocos2dxHandler.ShareMessage;
-
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.SurfaceView;
 
@@ -61,6 +60,8 @@ public class Cocos2dxHelper {
 	private static float sScreenPhysicalWidth;
 	private static float sScreenPhysicalHeight;
 	private static float sScreenDensity;
+
+	private static Context sContext; 
 	
 	// ===========================================================
 	// Constructors
@@ -85,6 +86,8 @@ public class Cocos2dxHelper {
 		sCameraWasPaused = false;
 		
 		sScreenDensity = pContext.getResources().getDisplayMetrics().density;
+		
+		sContext = pContext;
 		
 	}
 
@@ -319,6 +322,12 @@ public class Cocos2dxHelper {
 		
 		//facebook share
 		if (tag==2) {
+			
+			Intent intent = new Intent("postImageToFacebook");
+			intent.putExtra("imagePath", imagePath);
+			intent.putExtra("shareText", shareText);
+			LocalBroadcastManager.getInstance(sContext).sendBroadcast(intent);
+	
 			//final ShareMessage dialogMessage = (ShareMessage)msg.obj;
 			Log.i("Cocos2dxHelper", "dialogMessage: "+imagePath + "text: "+shareText);
 		}
@@ -331,7 +340,9 @@ public class Cocos2dxHelper {
 	}
 	
 	public static void exitWheelsConfigurator() {
-		
+		Intent intent = new Intent("exitWheelsConfigurator");
+		intent.putExtra("exitWheelsConfigurator", true);
+		LocalBroadcastManager.getInstance(sContext).sendBroadcast(intent);
 	}
 	
 	public static void postImageToFacebook(final String pShareText,final String pPath,final String pOptionYES,final String pOptionNO) {
@@ -339,8 +350,13 @@ public class Cocos2dxHelper {
 		Cocos2dxHelper.sCocos2dxHelperListener.showShareDialog(2, pShareText, pPath, pOptionYES, pOptionNO);
 	}
 	
-	public static void sendPerEmail(final String pPath) {
-		Log.i("Cocos2dxHelper", "pPath: " + pPath);
+	public static void sendPerEmail(final String imagePath) {
+		
+		Intent intent = new Intent("sendPerEmail");
+		intent.putExtra("imagePath", imagePath);
+		LocalBroadcastManager.getInstance(sContext).sendBroadcast(intent);
+		
+		Log.i("Cocos2dxHelper", "pPath: " + imagePath);
 	}
 
 	// ===========================================================
