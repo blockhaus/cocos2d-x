@@ -319,19 +319,6 @@ public class Cocos2dxHelper {
 	}
 	
 	public static void setAlertViewClickedButtonWithTagAtIndex(final int tag, final int buttonIndex,final String imagePath, final String shareText) {
-		
-		//facebook share
-		if (tag==2) {
-			
-			Intent intent = new Intent("postImageToFacebook");
-			intent.putExtra("imagePath", imagePath);
-			intent.putExtra("shareText", shareText);
-			LocalBroadcastManager.getInstance(sContext).sendBroadcast(intent);
-	
-			//final ShareMessage dialogMessage = (ShareMessage)msg.obj;
-			Log.i("Cocos2dxHelper", "dialogMessage: "+imagePath + "text: "+shareText);
-		}
-		
 		Cocos2dxHelper.setAlertViewClickedButtonWithTagAtIndex(tag, buttonIndex);
 	}
 	
@@ -347,7 +334,9 @@ public class Cocos2dxHelper {
 	
 	public static void postImageToFacebook(final String pShareText,final String pPath,final String pOptionYES,final String pOptionNO) {
 		Log.i("Cocos2dxHelper", "pPath: " + pPath);
-		Cocos2dxHelper.sCocos2dxHelperListener.showShareDialog(2, pShareText, pPath, pOptionYES, pOptionNO);
+		Intent intent = new Intent("postImageToFacebook");
+		intent.putExtra("imagePath", pPath);
+		LocalBroadcastManager.getInstance(sContext).sendBroadcast(intent);
 	}
 	
 	public static void sendPerEmail(final String imagePath) {
