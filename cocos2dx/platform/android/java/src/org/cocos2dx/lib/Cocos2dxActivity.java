@@ -26,11 +26,8 @@ package org.cocos2dx.lib;
 import org.cocos2dx.lib.Cocos2dxHelper.Cocos2dxHelperListener;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
@@ -97,10 +94,10 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
 	
 	@Override
 	public void showShareDialog(final int pTag, final String pTitle, final String pImagePath, final String optionYES, final String optionNO) {
-		Intent intent = new Intent("postImageToFacebook");
-		intent.putExtra("imagePath", pImagePath);
-		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-		Log.i("Cocos2dxHelper", "share on facebook: " + pImagePath);
+		Message msg = new Message();
+		msg.what = Cocos2dxHandler.HANDLER_SHOW_SHAREDIALOG;
+		msg.obj = new Cocos2dxHandler.ShareMessage(pTag, pTitle, pImagePath, optionYES, optionNO);
+		this.mHandler.sendMessage(msg);
 	}
 
 	@Override
