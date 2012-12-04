@@ -20,10 +20,10 @@ int* rgbData = NULL;
 JNIEXPORT void JNICALL
 Java_org_cocos2dx_lib_Cocos2dxCamera_onPictureTaken(JNIEnv* env, jobject thiz, jbyteArray jdata, jint dataLen, jint  width, jint height) {
 	std::string path = CCFileUtils::sharedFileUtils()->getWriteablePath();
+
 	path.append("camera_image.jpg");
 
-	CCLog("native width %d height %d", width, height);
-    
+
     int newWidth;
     int newHeight;
     float aspectRatio = (float)width/(float)height;
