@@ -432,6 +432,30 @@ bool CCTexturePVR::initWithContentsOfFile(const char* path)
     return true;
 }
 
+bool CCTexturePVR::initWithPVRData(unsigned char* pvrdata, int pvrlen)
+{
+    
+    m_uNumberOfMipmaps = 0;
+    
+    m_uName = 0;
+    m_uWidth = m_uHeight = 0;
+    m_bHasAlpha = false;
+    
+    m_bRetainName = false; // cocos2d integration
+    
+    if (!unpackPVRData(pvrdata, pvrlen)  || !createGLTexture())
+    {
+        CC_SAFE_DELETE_ARRAY(pvrdata);
+        this->release();
+        return false;
+    }
+    
+    CC_SAFE_DELETE_ARRAY(pvrdata);
+    
+    return true;
+}
+
+
 CCTexturePVR * CCTexturePVR::pvrTextureWithContentsOfFile(const char* path)
 {
     return CCTexturePVR::create(path);

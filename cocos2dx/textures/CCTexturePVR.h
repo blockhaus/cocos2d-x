@@ -85,6 +85,8 @@ public:
 
     /** initializes a CCTexturePVR with a path */
     bool initWithContentsOfFile(const char* path);
+    
+    bool initWithPVRData(unsigned char* pvrdata, int pvrlen);
 
     /** creates and initializes a CCTexturePVR with a path 
      @deprecated This interface will be deprecated when js-binding is stable. */
